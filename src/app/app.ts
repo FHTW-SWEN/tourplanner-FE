@@ -1,12 +1,11 @@
-import { Component, signal } from '@angular/core';
-import { ItemList } from '../components/selectable-items/item-list';
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { Header } from './components/header/header';
 
 @Component({
   selector: 'app-root',
-  imports: [ItemList],
+  imports: [RouterOutlet, Header],
   templateUrl: './app.html',
   styleUrl: './app.css',
 })
-export class App {
-  protected readonly title = signal('SWEN1');
-}
+export class App {}

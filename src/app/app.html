@@ -1,5 +1,8 @@
-<main class="h-screen w-screen flex flex-col gap-4 justify-center items-center">
-  <!-- <search-input></search-input> -->
-  <!-- <three-values></three-values> -->
-  <item-list></item-list>
-</main>
+<div class="flex h-screen w-screen flex-col">
+  <app-header />
+  <main class="flex min-h-0 flex-1 flex-col overflow-hidden">
+    <div class="flex min-h-0 flex-1 flex-col">
+      <router-outlet />
+    </div>
+  </main>
+</div>
