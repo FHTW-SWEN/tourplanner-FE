@@ -1,3 +1,15 @@
 /* You can add global styles to this file, and also import other style files */
 
 @import "tailwindcss";
+
+@theme {
+  /* Primary - pastel pink */
+  --color-primary: #f9c4d4;
+  --color-primary-hover: #f5b0c4;
+  --color-primary-light: #fcdce4;
+
+  /* Secondary - warm gray */
+  --color-secondary: #b8a99a;
+  --color-secondary-hover: #9c8f82;
+  --color-secondary-light: #d4c9bf;
+}
