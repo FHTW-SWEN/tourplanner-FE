@@ -1,0 +1,38 @@
+<div>
+  <div>
+    <input
+      type="range"
+      [value]="vm.a()"
+      (input)="onInputA($event.target.value)"
+      id="a"
+      min="0"
+      max="10"
+      step="1"
+    />
+    <label for="a">A</label>
+  </div>
+  <div>
+    <input
+      type="range"
+      [value]="vm.b()"
+      (input)="onInputB($event.target.value)"
+      id="b"
+      min="0"
+      max="10"
+      step="1"
+    />
+    <label for="b">B</label>
+  </div>
+  <div>
+    <input
+      type="range"
+      [value]="vm.c()"
+      (input)="onInputC($event.target.value)"
+      id="c"
+      min="0"
+      max="10"
+      step="1"
+    />
+    <label for="c">C</label>
+  </div>
+</div>
