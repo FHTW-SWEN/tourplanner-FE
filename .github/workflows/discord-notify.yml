@@ -1,0 +1,81 @@
+name: Discord Notification
+
+on:
+  pull_request:
+    types: [opened, closed, reopened]
+  push:
+    branches: [main]
+  issues:
+    types: [opened, closed]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    if: github.event_name != 'push' || github.repository == github.event.repository.full_name
+    steps:
+      - name: Notify Discord
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          GITHUB_EVENT: ${{ toJSON(github.event) }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_REPO: ${{ github.repository }}
+          GITHUB_REPO_NAME: ${{ github.event.repository.name }}
+        run: |
+          if [ -z "$DISCORD_WEBHOOK" ]; then
+            echo "DISCORD_WEBHOOK_URL secret is not set. Skipping notification."
+            exit 0
+          fi
+
+          echo "$GITHUB_EVENT" > event.json
+          REPO_NAME=$(jq -r '.repository.name' event.json)
+          ACTOR="$GITHUB_ACTOR"
+          BASE_URL="https://github.com/$GITHUB_REPO"
+          COLOR_OPEN=3066993
+          COLOR_CLOSE=15844367
+          COLOR_MERGE=5763719
+          COLOR_PUSH=3447003
+          COLOR_ISSUE=15105570
+
+          PAYLOAD=$(jq -n \
+            --slurpfile ev event.json \
+            --arg repo "$REPO_NAME" \
+            --arg actor "$ACTOR" \
+            --arg base_url "$BASE_URL" \
+            --argjson c_open "$COLOR_OPEN" \
+            --argjson c_close "$COLOR_CLOSE" \
+            --argjson c_merge "$COLOR_MERGE" \
+            --argjson c_push "$COLOR_PUSH" \
+            --argjson c_issue "$COLOR_ISSUE" \
+            '
+              $ev[0] as $e |
+              (now | strftime("%Y-%m-%dT%H:%M:%SZ")) as $ts |
+              if $e.pull_request then
+                { num: ($e.pull_request.number | tostring), title: $e.pull_request.title, url: $e.pull_request.html_url, action: $e.action, merged: ($e.pull_request.merged // false) }
+                | if .action == "opened" then
+                    { embeds: [{ title: "🆕 [\($repo)] PR opened: #\(.num) \(.title)", url: .url, color: $c_open, footer: { text: "by \($actor)" }, timestamp: $ts }] }
+                  elif .action == "reopened" then
+                    { embeds: [{ title: "🔄 [\($repo)] PR reopened: #\(.num) \(.title)", url: .url, color: $c_open, footer: { text: "by \($actor)" }, timestamp: $ts }] }
+                  elif .merged then
+                    { embeds: [{ title: "✅ [\($repo)] PR merged: #\(.num) \(.title)", url: .url, color: $c_merge, footer: { text: "by \($actor)" }, timestamp: $ts }] }
+                  else
+                    { embeds: [{ title: "❌ [\($repo)] PR closed: #\(.num) \(.title)", url: .url, color: $c_close, footer: { text: "by \($actor)" }, timestamp: $ts }] }
+                  end
+              elif $e.issue then
+                { num: ($e.issue.number | tostring), title: $e.issue.title, url: $e.issue.html_url, action: $e.action }
+                | { embeds: [{ title: "📌 [\($repo)] Issue \(.action): #\(.num) \(.title)", url: .url, color: $c_issue, footer: { text: "by \($actor)" }, timestamp: $ts }] }
+              elif $e.head_commit then
+                ($e.head_commit.message | split("\n")[0]) as $msg |
+                { embeds: [{ title: "🚀 [\($repo)] Push to main", description: $msg, url: "\($base_url)/commit/\($e.after)", color: $c_push, footer: { text: "by \($actor)" }, timestamp: $ts }] }
+              else
+                empty
+              end
+            '
+          )
+
+          if [ -z "$PAYLOAD" ] || [ "$PAYLOAD" = "null" ]; then
+            echo "No payload for this event. Skipping."
+            exit 0
+          fi
+
+          echo "$PAYLOAD" | curl -s -X POST -H "Content-Type: application/json" -d @- "$DISCORD_WEBHOOK" || true
