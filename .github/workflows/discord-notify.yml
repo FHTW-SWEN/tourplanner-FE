@@ -48,22 +48,24 @@ jobs:
             --argjson c_push "$COLOR_PUSH" \
             --argjson c_issue "$COLOR_ISSUE" \
             '
+              def truncate(max): if length > max then .[0:(max-3)] + "..." else . end;
+              def desc_from_body(b): (b // "") | gsub("\r"; "") | truncate(4096);
               $ev[0] as $e |
               (now | strftime("%Y-%m-%dT%H:%M:%SZ")) as $ts |
               if $e.pull_request then
-                { num: ($e.pull_request.number | tostring), title: $e.pull_request.title, url: $e.pull_request.html_url, action: $e.action, merged: ($e.pull_request.merged // false) }
+                { num: ($e.pull_request.number | tostring), title: $e.pull_request.title, url: $e.pull_request.html_url, action: $e.action, merged: ($e.pull_request.merged // false), body: desc_from_body($e.pull_request.body) }
                 | if .action == "opened" then
-                    { embeds: [{ title: "🆕 [\($repo)] PR opened: #\(.num) \(.title)", url: .url, color: $c_open, footer: { text: "by \($actor)" }, timestamp: $ts }] }
+                    { embeds: [{ title: "🆕 [\($repo)] PR opened: #\(.num) \(.title)", description: .body, url: .url, color: $c_open, footer: { text: "by \($actor)" }, timestamp: $ts }] }
                   elif .action == "reopened" then
-                    { embeds: [{ title: "🔄 [\($repo)] PR reopened: #\(.num) \(.title)", url: .url, color: $c_open, footer: { text: "by \($actor)" }, timestamp: $ts }] }
+                    { embeds: [{ title: "🔄 [\($repo)] PR reopened: #\(.num) \(.title)", description: .body, url: .url, color: $c_open, footer: { text: "by \($actor)" }, timestamp: $ts }] }
                   elif .merged then
-                    { embeds: [{ title: "✅ [\($repo)] PR merged: #\(.num) \(.title)", url: .url, color: $c_merge, footer: { text: "by \($actor)" }, timestamp: $ts }] }
+                    { embeds: [{ title: "✅ [\($repo)] PR merged: #\(.num) \(.title)", description: .body, url: .url, color: $c_merge, footer: { text: "by \($actor)" }, timestamp: $ts }] }
                   else
-                    { embeds: [{ title: "❌ [\($repo)] PR closed: #\(.num) \(.title)", url: .url, color: $c_close, footer: { text: "by \($actor)" }, timestamp: $ts }] }
+                    { embeds: [{ title: "❌ [\($repo)] PR closed: #\(.num) \(.title)", description: .body, url: .url, color: $c_close, footer: { text: "by \($actor)" }, timestamp: $ts }] }
                   end
               elif $e.issue then
-                { num: ($e.issue.number | tostring), title: $e.issue.title, url: $e.issue.html_url, action: $e.action }
-                | { embeds: [{ title: "📌 [\($repo)] Issue \(.action): #\(.num) \(.title)", url: .url, color: $c_issue, footer: { text: "by \($actor)" }, timestamp: $ts }] }
+                { num: ($e.issue.number | tostring), title: $e.issue.title, url: $e.issue.html_url, action: $e.action, body: desc_from_body($e.issue.body) }
+                | { embeds: [{ title: "📌 [\($repo)] Issue \(.action): #\(.num) \(.title)", description: .body, url: .url, color: $c_issue, footer: { text: "by \($actor)" }, timestamp: $ts }] }
               elif $e.head_commit then
                 ($e.head_commit.message | split("\n")[0]) as $msg |
                 { embeds: [{ title: "🚀 [\($repo)] Push to main", description: $msg, url: "\($base_url)/commit/\($e.after)", color: $c_push, footer: { text: "by \($actor)" }, timestamp: $ts }] }
