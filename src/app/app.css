@@ -1,0 +1,6 @@
+/* So the routed component becomes the flex child of main's wrapper */
+main router-outlet + * {
+  display: flex;
+  flex: 1 1 0;
+  min-height: 0;
+}
