@@ -4,6 +4,21 @@ Angular frontend for the Tour Planner web application.
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.4.
 
+## Project structure
+
+```
+src/
+├── app/
+│   ├── core/           # models, services, guards
+│   ├── layout/         # app shell (header, footer)
+│   ├── features/       # feature modules (auth, tours)
+│   ├── app.routes.ts
+│   └── app.config.ts
+├── environments/
+├── main.ts
+└── index.html
+```
+
 ## Development server
 
 To start a local development server, run:
