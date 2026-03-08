@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { TourDetail } from './tour-detail';
-import { TourSidebar } from './tour-sidebar';
+import { TourDetail } from './tour-detail/tour-detail';
+import { TourSidebar } from './tour-sidebar/tour-sidebar';
 
 @Component({
   selector: 'app-tours-page',
