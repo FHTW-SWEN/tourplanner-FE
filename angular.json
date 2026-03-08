@@ -6,7 +6,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "test": {
+    "tourplanner": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -62,10 +62,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "test:build:production"
+              "buildTarget": "tourplanner:build:production"
             },
             "development": {
-              "buildTarget": "test:build:development"
+              "buildTarget": "tourplanner:build:development"
             }
           },
           "defaultConfiguration": "development"
