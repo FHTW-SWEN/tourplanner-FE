@@ -1,8 +1,3 @@
-/**
- * Route data for the map (e.g. GeoJSON or array of coordinates).
- * Format depends on Leaflet and backend agreement.
- */
-export type TourRoute = Record<string, unknown> | unknown[];
 
 export interface Tour {
   id?: string;
