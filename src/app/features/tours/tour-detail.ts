@@ -6,7 +6,7 @@ import { Component } from '@angular/core';
   host: { class: 'min-h-0 flex-1' },
   template: `
     <section class="h-full min-h-0 overflow-auto p-4">
-      <div class="text-secondary">Tour detail</div>
+      <div>Tour detail</div>
     </section>
   `,
 })
