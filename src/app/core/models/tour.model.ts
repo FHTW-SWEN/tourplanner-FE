@@ -8,7 +8,6 @@ export interface Tour {
   transportType: string;
   distance: number;
   estimatedTime: number;
-  route?: TourRoute;
   /** Computed by backend (e.g. from log count). */
   popularity?: number;
   /** Computed by backend. */
