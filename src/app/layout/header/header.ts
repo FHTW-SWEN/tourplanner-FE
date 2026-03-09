@@ -3,18 +3,7 @@ import { Component } from '@angular/core';
 @Component({
   selector: 'app-header',
   standalone: true,
-  template: `
-    <header class="flex h-14 shrink-0 items-center justify-between border-b border-secondary-light bg-primary-light px-4">
-      <span class="font-semibold text-gray-500">TourPlanner</span>
-      <div class="flex items-center gap-2 text-sm text-gray-500">
-        <span>{{ userName }}</span>
-        <span aria-hidden="true">|</span>
-        <button type="button" (click)="onLogout()" class="hover:text-secondary-hover">
-          Logout
-        </button>
-      </div>
-    </header>
-  `,
+  templateUrl: "./header.html",
 })
 export class Header {
   protected readonly userName = 'Max Mustermann';
