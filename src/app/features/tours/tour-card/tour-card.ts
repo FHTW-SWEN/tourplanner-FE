@@ -14,6 +14,10 @@ export class TourCard {
   @Input() tour!: Tour
   vm = inject(ToursViewModel)
 
+  get isSelected() {
+    return this.vm.selectedTour() === this.tour
+  }
+
   selectTour(tour: Tour) {
     this.vm.selectTour(tour)
   }
