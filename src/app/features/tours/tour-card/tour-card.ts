@@ -15,7 +15,7 @@ export class TourCard {
   vm = inject(ToursViewModel)
 
   get isSelected() {
-    return this.vm.selectedTour() === this.tour
+    return this.vm.selectedTour()?.id === this.tour.id
   }
 
   selectTour(tour: Tour) {
