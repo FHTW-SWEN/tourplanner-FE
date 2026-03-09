@@ -13,4 +13,8 @@ import { ToursViewModel } from '../tours.viewmodel'
 export class TourCard {
   @Input() tour!: Tour
   vm = inject(ToursViewModel)
+
+  selectTour(tour: Tour) {
+    this.vm.selectTour(tour)
+  }
 }

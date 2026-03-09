@@ -1,4 +1,6 @@
 <div class="rounded-lg border border-secondary-light bg-white p-3 shadow-sm transition-shadow hover:shadow-md mb-3"
+  (click)="selectTour(tour)"
+  [ngClass]="vm.selectedTour() && vm.selectedTour()?.id === tour.id ? 'bg-primary-bg' : 'bg-white'"
   >
   <div class="text-base font-bold text-primary">
     {{ tour.name }}
