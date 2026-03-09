@@ -1,6 +1,7 @@
-import { Component, Input } from '@angular/core'
+import { Component, Input, inject } from '@angular/core'
 import type { Tour } from '../../../core/models/tour.model'
 import { DurationPipe } from '../../../duration-pipe'
+import { ToursViewModel } from '../tours.viewmodel'
 
 @Component({
     selector: 'tour-card',
@@ -10,4 +11,5 @@ import { DurationPipe } from '../../../duration-pipe'
 })
 export class TourCard {
   @Input() tour!: Tour
+  vm = inject(ToursViewModel)
 }

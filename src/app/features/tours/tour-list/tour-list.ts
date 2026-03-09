@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import { TourCard } from '../tour-card/tour-card';
-import { ToursViewModel } from './tour-list.viewmodel';
+import { ToursViewModel } from '../tours.viewmodel';
 
 @Component ({
     selector: 'tour-list',
