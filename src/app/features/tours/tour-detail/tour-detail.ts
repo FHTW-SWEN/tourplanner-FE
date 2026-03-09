@@ -4,10 +4,6 @@ import { Component } from '@angular/core';
   selector: 'app-tour-detail',
   standalone: true,
   host: { class: 'min-h-0 flex-1' },
-  template: `
-    <section class="h-full min-h-0 overflow-auto p-4">
-      <div class="text-secondary">Tour detail</div>
-    </section>
-  `,
+  templateUrl: "./tour-detail.html",
 })
 export class TourDetail {}
