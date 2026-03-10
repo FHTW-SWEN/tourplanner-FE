@@ -12,13 +12,14 @@ import { ToursViewModel } from '../tours.viewmodel'
 })
 export class TourCard {
   @Input() tour!: Tour
+
   vm = inject(ToursViewModel)
 
   get isSelected() {
     return this.vm.selectedTour()?.id === this.tour.id
   }
 
-  selectTour(tour: Tour) {
-    this.vm.selectTour(tour)
+  selectTour() {
+    this.vm.selectTour(this.tour)
   }
 }
