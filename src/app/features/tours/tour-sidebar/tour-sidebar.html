@@ -1,15 +1,17 @@
 <aside class="flex min-h-0 w-72 flex-1 flex-col border-r border-secondary-light p-4">
-    <div class="text-secondary">Tour sidebar</div>
-    <button
-      class="mt-auto w-full rounded bg-[#1e3a5f] px-4 py-2 text-sm font-medium text-white hover:bg-[#16304f]"
-      (click)="openAddTourModal()"
-    >
-      + Add New Tour
-    </button>
+  <div class="text-secondary">Tour sidebar</div>
 
-    <app-add-tour-modal
-      [isOpen]="isModalOpen"
-      (close)="closeAddTourModal()"
-      (save)="handleSaveTour($event)"
-    ></app-add-tour-modal>
+  <button
+    class="mt-auto w-full rounded bg-[#1e3a5f] px-4 py-2 text-sm font-medium text-white hover:bg-[#16304f]"
+    (click)="openAddTourModal()"
+  >
+    + Add New Tour
+  </button>
+
+  <app-add-tour-modal
+    [isOpen]="isModalOpen"
+    (close)="closeAddTourModal()"
+    (save)="handleSaveTour($event)"
+  ></app-add-tour-modal>
+
 </aside>
