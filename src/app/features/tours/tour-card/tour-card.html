@@ -2,10 +2,22 @@
   (click)="selectTour()"
   [ngClass]="isSelected ? 'bg-primary-bg' : 'bg-white'"
   >
-  <div class="text-base font-bold text-primary">
-    {{ tour.name }}
+  <div class="flex items-start justify-between">
+    <div class="text-base font-bold text-primary">{{ tour.name }}</div>
+    <div class="flex gap-1 shrink-0 ml-2" (click)="$event.stopPropagation()">
+      <button
+        class="rounded px-2 py-0.5 text-xs text-blue-600 hover:bg-blue-50"
+        (click)="edit.emit(tour)"
+        type="button"
+      >Edit</button>
+      <button
+        class="rounded px-2 py-0.5 text-xs text-red-500 hover:bg-red-50"
+        (click)="delete.emit(tour.id)"
+        type="button"
+      >Delete</button>
+    </div>
   </div>
-  <div class="text-sm text-gray-600">
+  <div class="text-sm text-gray-600 mt-1">
     <span>{{ tour.distance }} km</span>
     <span class="mx-1">•</span>
     <span>{{ tour.estimatedTime | duration }}</span>

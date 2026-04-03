@@ -1,4 +1,4 @@
-import { Component, Input, inject } from '@angular/core'
+import { Component, EventEmitter, Input, Output, inject } from '@angular/core'
 import { CommonModule } from '@angular/common'
 import type { Tour } from '../../../core/models/tour.model'
 import { DurationPipe } from '../../../duration-pipe'
@@ -12,6 +12,8 @@ import { ToursViewModel } from '../tours.viewmodel'
 })
 export class TourCard {
   @Input() tour!: Tour
+  @Output() edit = new EventEmitter<Tour>();
+  @Output() delete = new EventEmitter<string>();
 
   vm = inject(ToursViewModel)
 

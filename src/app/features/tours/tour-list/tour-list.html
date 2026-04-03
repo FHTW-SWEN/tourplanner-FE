@@ -1,3 +1,7 @@
-@for (tour of vm.tours(); track tour.id) {
-  <tour-card [tour]="tour"></tour-card>
+@for (tour of vm.toursWithStats(); track tour.id) {
+  <tour-card
+    [tour]="tour"
+    (edit)="editTour.emit($event)"
+    (delete)="handleDelete($event)"
+  ></tour-card>
 }

@@ -1,6 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { TourList } from '../tour-list/tour-list';
-import { AddTourModal, NewTourPayload } from '../add-tour-modal/add-tour-modal';
+import { AddTourModal, TourPayload } from '../add-tour-modal/add-tour-modal';
+import { ToursViewModel } from '../tours.viewmodel';
+import type { Tour } from '../../../core/models/index';
 
 @Component({
   selector: 'app-tour-sidebar',
@@ -10,18 +12,51 @@ import { AddTourModal, NewTourPayload } from '../add-tour-modal/add-tour-modal';
   templateUrl: './tour-sidebar.html',
 })
 export class TourSidebar {
+  private vm = inject(ToursViewModel);
   isModalOpen = false;
+  editingTour: Tour | null = null;
 
   openAddTourModal(): void {
+    this.editingTour = null;
     this.isModalOpen = true;
   }
 
-  closeAddTourModal(): void {
-    this.isModalOpen = false;
+  openEditTourModal(tour: Tour): void {
+    this.editingTour = tour;
+    this.isModalOpen = true;
   }
 
-  handleSaveTour(tour: NewTourPayload): void {
-    console.log('saved tour', tour);
-    // TODO: hier One-way Data-Fluss implementieren (z.B. Service) statt console.log
+  closeModal(): void {
+    this.isModalOpen = false;
+    this.editingTour = null;
+  }
+
+  handleSaveTour(payload: TourPayload): void {
+    if (this.editingTour) {
+      this.vm.updateTour({
+        ...this.editingTour,
+        name: payload.name,
+        description: payload.description,
+        from: payload.from,
+        to: payload.to,
+        transportType: payload.transport,
+        imageUrl: payload.imageUrl,
+      });
+    } else {
+      this.vm.tours.update(tours => [
+        ...tours,
+        {
+          id: crypto.randomUUID(),
+          name: payload.name,
+          description: payload.description,
+          from: payload.from,
+          to: payload.to,
+          transportType: payload.transport,
+          imageUrl: payload.imageUrl,
+          distance: 0,
+          estimatedTime: 0,
+        },
+      ]);
+    }
   }
 }
