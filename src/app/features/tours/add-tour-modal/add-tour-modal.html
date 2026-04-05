@@ -56,10 +56,9 @@
             [(ngModel)]="form.transport"
             required
           >
-            <option>Bike</option>
-            <option>Car</option>
-            <option>Walk</option>
-            <option>Public Transport</option>
+            @for (opt of transportOptions; track opt.value) {
+              <option [ngValue]="opt.value">{{ opt.label }}</option>
+            }
           </select>
         </div>
 
@@ -77,7 +76,7 @@
         </div>
 
         <div class="mb-4 rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800">
-          Distance & Time: auto-filled via OpenRouteService API
+          Distance and estimated time are not calculated yet (demo data or 0 for new tours). OpenRouteService can be added later.
         </div>
 
         <div class="flex justify-end gap-2">
