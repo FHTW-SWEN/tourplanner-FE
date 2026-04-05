@@ -1,0 +1,26 @@
+<div class="rounded-lg border border-secondary-light bg-white p-3 shadow-sm mb-2">
+  <div class="flex items-start justify-between">
+    <div>
+      <p class="text-xs text-gray-400">{{ log.dateTime | date:'dd.MM.yyyy HH:mm' }}</p>
+      <p class="mt-1 text-sm text-gray-700">{{ log.comment }}</p>
+    </div>
+    <div class="flex gap-1 shrink-0 ml-2">
+      <button
+        class="rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50"
+        (click)="edit.emit(log)"
+        type="button"
+      >Edit</button>
+      <button
+        class="rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50"
+        (click)="delete.emit(log.id)"
+        type="button"
+      >Delete</button>
+    </div>
+  </div>
+  <div class="mt-2 flex flex-wrap gap-3 text-xs text-gray-500">
+    <span>{{ log.totalDistance }} km</span>
+    <span>{{ log.totalTime | duration }}</span>
+    <span>Difficulty: {{ difficultyLabel(log.difficulty) }}</span>
+    <span class="text-yellow-500">{{ stars(log.rating) }}</span>
+  </div>
+</div>

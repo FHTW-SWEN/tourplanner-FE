@@ -1,0 +1,105 @@
+@if (isOpen) {
+  <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4" (click)="closeModal()">
+    <div class="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-xl font-semibold">{{ editLog ? 'Edit Tour Log' : 'Add Tour Log' }}</h2>
+        <button class="text-gray-500 hover:text-gray-700" (click)="closeModal()" type="button">✕</button>
+      </div>
+
+      <form #logForm="ngForm" (ngSubmit)="submit(logForm)">
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-slate-700">Date & Time *</label>
+          <input
+            type="datetime-local"
+            class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+            name="dateTime"
+            [(ngModel)]="form.dateTime"
+            required
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-slate-700">Comment</label>
+          <textarea
+            class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+            name="comment"
+            [(ngModel)]="form.comment"
+            rows="3"
+          ></textarea>
+        </div>
+
+        <div class="mb-3 grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Total Distance (km) *</label>
+            <input
+              type="number"
+              min="0"
+              step="0.1"
+              class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+              name="totalDistance"
+              [(ngModel)]="form.totalDistance"
+              required
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Total Time (min) *</label>
+            <input
+              type="number"
+              min="0"
+              class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+              name="totalTime"
+              [(ngModel)]="form.totalTime"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="mb-3 grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Difficulty *</label>
+            <select
+              class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+              name="difficulty"
+              [(ngModel)]="form.difficulty"
+              required
+            >
+              <option [value]="1">1 – Easy</option>
+              <option [value]="2">2 – Moderate</option>
+              <option [value]="3">3 – Hard</option>
+              <option [value]="4">4 – Very Hard</option>
+              <option [value]="5">5 – Extreme</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Rating *</label>
+            <select
+              class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+              name="rating"
+              [(ngModel)]="form.rating"
+              required
+            >
+              <option [value]="1">★☆☆☆☆</option>
+              <option [value]="2">★★☆☆☆</option>
+              <option [value]="3">★★★☆☆</option>
+              <option [value]="4">★★★★☆</option>
+              <option [value]="5">★★★★★</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2">
+          <button type="button" class="rounded border border-slate-300 px-4 py-2 text-sm" (click)="closeModal()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="rounded bg-[#1e3a5f] px-4 py-2 text-sm font-medium text-white hover:bg-[#16304f]"
+            [disabled]="!logForm.valid"
+          >
+            Save Log
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

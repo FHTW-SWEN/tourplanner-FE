@@ -1,8 +1,8 @@
 @if (isOpen) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" (click)="closeModal()">
+  <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4" (click)="closeModal()">
     <div class="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
       <div class="mb-4 flex items-center justify-between">
-        <h2 class="text-xl font-semibold">Add New Tour</h2>
+        <h2 class="text-xl font-semibold">{{ editTour ? 'Edit Tour' : 'Add New Tour' }}</h2>
         <button class="text-gray-500 hover:text-gray-700" (click)="closeModal()" type="button">✕</button>
       </div>
 
@@ -12,7 +12,7 @@
           <input
             class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
             name="name"
-            [(ngModel)]="newTour.name"
+            [(ngModel)]="form.name"
             required
           />
         </div>
@@ -22,8 +22,8 @@
           <textarea
             class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
             name="description"
-            [(ngModel)]="newTour.description"
-            rows="3"
+            [(ngModel)]="form.description"
+            rows="2"
           ></textarea>
         </div>
 
@@ -33,7 +33,7 @@
             <input
               class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
               name="from"
-              [(ngModel)]="newTour.from"
+              [(ngModel)]="form.from"
               required
             />
           </div>
@@ -42,18 +42,18 @@
             <input
               class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
               name="to"
-              [(ngModel)]="newTour.to"
+              [(ngModel)]="form.to"
               required
             />
           </div>
         </div>
 
-        <div class="mb-5">
+        <div class="mb-3">
           <label class="block text-sm font-medium text-slate-700">Transport Type *</label>
           <select
             class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
             name="transport"
-            [(ngModel)]="newTour.transport"
+            [(ngModel)]="form.transport"
             required
           >
             <option>Bike</option>
@@ -61,6 +61,19 @@
             <option>Walk</option>
             <option>Public Transport</option>
           </select>
+        </div>
+
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-slate-700">Tour Image</label>
+          <input
+            type="file"
+            accept="image/*"
+            class="mt-1 w-full text-sm text-slate-600"
+            (change)="onImageSelected($event)"
+          />
+          @if (form.imageUrl) {
+            <img [src]="form.imageUrl" alt="Tour preview" class="mt-2 h-24 w-full rounded object-cover" />
+          }
         </div>
 
         <div class="mb-4 rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800">
@@ -76,7 +89,7 @@
             class="rounded bg-[#1e3a5f] px-4 py-2 text-sm font-medium text-white hover:bg-[#16304f]"
             [disabled]="!addTourForm.valid"
           >
-            Save Tour
+            {{ editTour ? 'Update Tour' : 'Save Tour' }}
           </button>
         </div>
       </form>

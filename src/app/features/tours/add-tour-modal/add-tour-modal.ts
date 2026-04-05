@@ -1,13 +1,15 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
+import type { Tour } from '../../../core/models/index';
 
-export interface NewTourPayload {
+export interface TourPayload {
   name: string;
   description: string;
   from: string;
   to: string;
   transport: string;
+  imageUrl?: string;
 }
 
 @Component({
@@ -16,41 +18,49 @@ export interface NewTourPayload {
   imports: [CommonModule, FormsModule],
   templateUrl: './add-tour-modal.html',
 })
-export class AddTourModal {
+export class AddTourModal implements OnChanges {
   @Input() isOpen = false;
+  /** Pass a Tour to open the modal in Edit mode; null = Create mode. */
+  @Input() editTour: Tour | null = null;
   @Output() close = new EventEmitter<void>();
-  @Output() save = new EventEmitter<NewTourPayload>();
+  @Output() save = new EventEmitter<TourPayload>();
 
-  newTour: NewTourPayload = {
-    name: '',
-    description: '',
-    from: '',
-    to: '',
-    transport: 'Bike',
-  };
+  form: TourPayload = this.emptyForm();
 
-  closeModal(): void {
-    this.isOpen = false;
-    this.close.emit();
-    this.resetForm();
+  ngOnChanges(): void {
+    if (this.editTour) {
+      this.form = {
+        name: this.editTour.name,
+        description: this.editTour.description,
+        from: this.editTour.from,
+        to: this.editTour.to,
+        transport: this.editTour.transportType,
+        imageUrl: this.editTour.imageUrl ?? '',
+      };
+    } else {
+      this.form = this.emptyForm();
+    }
   }
 
-  resetForm(): void {
-    this.newTour = {
-      name: '',
-      description: '',
-      from: '',
-      to: '',
-      transport: 'Bike',
-    };
+  private emptyForm(): TourPayload {
+    return { name: '', description: '', from: '', to: '', transport: 'Bike', imageUrl: '' };
+  }
+
+  onImageSelected(event: Event): void {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      this.form.imageUrl = URL.createObjectURL(file);
+    }
+  }
+
+  closeModal(): void {
+    this.close.emit();
+    this.form = this.emptyForm();
   }
 
   submitTour(form: NgForm): void {
-    if (!form.valid) {
-      return;
-    }
-
-    this.save.emit({ ...this.newTour });
+    if (!form.valid) return;
+    this.save.emit({ ...this.form });
     this.closeModal();
   }
 }

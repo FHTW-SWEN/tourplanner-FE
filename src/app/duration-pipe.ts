@@ -13,14 +13,14 @@ export class DurationPipe implements PipeTransform {
     const mins = minutes % 60;
 
     if (hours > 0 && mins > 0) {
-      return `${hours}h ${mins}m`;
+      return `${hours}h ${mins}min`;
     }
 
     if (hours > 0) {
       return `${hours}h`;
     }
 
-    return `${mins}m`;
+    return `${mins}min`;
   }
 
 }
