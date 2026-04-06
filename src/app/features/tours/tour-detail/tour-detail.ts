@@ -1,4 +1,5 @@
 import { Component, inject } from '@angular/core';
+import { transportLabel } from '../../../core/constants/tour-transport';
 import { ToursViewModel } from '../tours.viewmodel';
 import { MapComponent } from '../map/map.component';
 import { TourLogList } from '../tour-log-list/tour-log-list';
@@ -11,5 +12,9 @@ import { TourLogList } from '../tour-log-list/tour-log-list';
   templateUrl: "./tour-detail.html",
 })
 export class TourDetail {
-  vm = inject(ToursViewModel)
+  vm = inject(ToursViewModel);
+
+  labelTransport(code: string): string {
+    return transportLabel(code);
+  }
 }

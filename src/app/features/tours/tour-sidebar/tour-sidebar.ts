@@ -32,6 +32,8 @@ export class TourSidebar {
   }
 
   handleSaveTour(payload: TourPayload): void {
+    const imageUrl = payload.imageUrl?.trim() || undefined;
+
     if (this.editingTour) {
       this.vm.updateTour({
         ...this.editingTour,
@@ -40,7 +42,7 @@ export class TourSidebar {
         from: payload.from,
         to: payload.to,
         transportType: payload.transport,
-        imageUrl: payload.imageUrl,
+        imageUrl,
       });
     } else {
       this.vm.tours.update(tours => [
@@ -52,7 +54,7 @@ export class TourSidebar {
           from: payload.from,
           to: payload.to,
           transportType: payload.transport,
-          imageUrl: payload.imageUrl,
+          ...(imageUrl ? { imageUrl } : {}),
           distance: 0,
           estimatedTime: 0,
         },

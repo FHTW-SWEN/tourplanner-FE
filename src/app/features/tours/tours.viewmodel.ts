@@ -4,9 +4,39 @@ import type { Tour, TourLog } from '../../core/models/index';
 @Injectable({ providedIn: 'root' })
 export class ToursViewModel {
   tours = signal<Tour[]>([
-    { id: '1', name: 'Berlin City Tour', description: 'Historic landmarks', from: 'Alexanderplatz', to: 'Brandenburg Gate', transportType: 'foot', distance: 5, estimatedTime: 120 },
-    { id: '2', name: 'Munich to Neuschwanstein', description: 'Fairytale castle', from: 'Munich Hauptbahnhof', to: 'Neuschwanstein Castle', transportType: 'car', distance: 120, estimatedTime: 480 },
-    { id: '3', name: 'Riverside Walk', description: 'Scenic path', from: 'Central Bridge', to: 'Marina Park', transportType: 'bicycle', distance: 15, estimatedTime: 90 },
+    {
+      id: '1',
+      name: 'Berlin City Tour',
+      description: 'Historic landmarks',
+      from: 'Alexanderplatz',
+      to: 'Brandenburg Gate',
+      transportType: 'walk',
+      distance: 5,
+      estimatedTime: 120,
+      imageUrl: 'https://picsum.photos/seed/berlin-tour/800/400',
+    },
+    {
+      id: '2',
+      name: 'Munich to Neuschwanstein',
+      description: 'Fairytale castle',
+      from: 'Munich Hauptbahnhof',
+      to: 'Neuschwanstein Castle',
+      transportType: 'car',
+      distance: 120,
+      estimatedTime: 480,
+      imageUrl: 'https://picsum.photos/seed/munich-tour/800/400',
+    },
+    {
+      id: '3',
+      name: 'Riverside Walk',
+      description: 'Scenic path',
+      from: 'Central Bridge',
+      to: 'Marina Park',
+      transportType: 'bike',
+      distance: 15,
+      estimatedTime: 90,
+      imageUrl: 'https://picsum.photos/seed/riverside-tour/800/400',
+    },
   ]);
 
   tourLogs = signal<TourLog[]>([

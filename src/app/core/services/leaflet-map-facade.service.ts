@@ -19,6 +19,11 @@ export class LeafletMapFacade {
   private markers: L.Marker[] = [];
   private routeLayer: L.Polyline | null = null;
 
+  /** True after `initMap` has created the Leaflet instance. */
+  isMapReady(): boolean {
+    return this.map !== null;
+  }
+
   /**
    * Initializes a Leaflet map inside the given HTML element.
    * Uses OpenStreetMap tiles by default.
@@ -29,6 +34,8 @@ export class LeafletMapFacade {
     }
 
     this.map = L.map(container).setView([lat, lng], zoom);
+
+    queueMicrotask(() => this.map?.invalidateSize());
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -66,6 +73,12 @@ export class LeafletMapFacade {
     this.clearRoute();
     this.routeLayer = L.polyline(coordinates, { color: '#e879a3', weight: 4 }).addTo(this.map);
     this.map.fitBounds(this.routeLayer.getBounds(), { padding: [40, 40] });
+    queueMicrotask(() => this.map?.invalidateSize());
+  }
+
+  /** Call after layout changes so tiles render in flex/scroll containers. */
+  invalidateSize(): void {
+    this.map?.invalidateSize();
   }
 
   /**
