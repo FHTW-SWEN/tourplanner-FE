@@ -111,6 +111,8 @@ export class ToursViewModel {
   }
 }
 */
+
+//new
 import { Injectable, signal, computed, inject } from '@angular/core';
 import type { Tour, TourLog } from '../../core/models/index';
 import { TourApiService } from '../../core/services/tour-api.service';

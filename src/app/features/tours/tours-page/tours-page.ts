@@ -11,6 +11,7 @@ import { TourSidebar } from '../tour-sidebar/tour-sidebar';
 })
 export class ToursPage {}*/
 
+//new
 import { Component, OnInit, inject } from '@angular/core';
 import { TourDetail } from '../tour-detail/tour-detail';
 import { TourSidebar } from '../tour-sidebar/tour-sidebar';

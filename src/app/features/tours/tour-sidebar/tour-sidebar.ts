@@ -61,6 +61,8 @@ export class TourSidebar {
       ]);
     }
   }*/
+
+    //new
  handleSaveTour(payload: TourPayload): void {
   const imageUrl = payload.imageUrl?.trim() || undefined;
 
