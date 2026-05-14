@@ -35,7 +35,7 @@ export class TourSidebar {
     const imageUrl = payload.imageUrl?.trim() || undefined;
 
     if (this.editingTour) {
-      // Edit → API aufrufen
+      // Edit -> call API
       this.vm.updateTour({
         ...this.editingTour,
         name: payload.name,
@@ -46,7 +46,7 @@ export class TourSidebar {
         imageUrl,
       });
     } else {
-      // Neu → API aufrufen
+      // Create -> call API
       this.vm.addTour({
         name: payload.name,
         description: payload.description,
