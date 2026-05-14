@@ -30,11 +30,12 @@ export class TourSidebar {
     this.isModalOpen = false;
     this.editingTour = null;
   }
-
+  
   handleSaveTour(payload: TourPayload): void {
     const imageUrl = payload.imageUrl?.trim() || undefined;
 
     if (this.editingTour) {
+      // Edit -> call API
       this.vm.updateTour({
         ...this.editingTour,
         name: payload.name,
@@ -45,20 +46,17 @@ export class TourSidebar {
         imageUrl,
       });
     } else {
-      this.vm.tours.update(tours => [
-        ...tours,
-        {
-          id: crypto.randomUUID(),
-          name: payload.name,
-          description: payload.description,
-          from: payload.from,
-          to: payload.to,
-          transportType: payload.transport,
-          ...(imageUrl ? { imageUrl } : {}),
-          distance: 0,
-          estimatedTime: 0,
-        },
-      ]);
+      // Create -> call API
+      this.vm.addTour({
+        name: payload.name,
+        description: payload.description,
+        from: payload.from,
+        to: payload.to,
+        transportType: payload.transport,
+        distance: 0,
+        estimatedTime: 0,
+        ...(imageUrl ? { imageUrl } : {}),
+      });
     }
-  }
+ }
 }

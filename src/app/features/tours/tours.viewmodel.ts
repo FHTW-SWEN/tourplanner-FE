@@ -1,53 +1,67 @@
-import { Injectable, signal, computed } from '@angular/core';
+import { Injectable, signal, computed, inject } from '@angular/core';
 import type { Tour, TourLog } from '../../core/models/index';
+import { TourApiService } from '../../core/services/tour-api.service';
 
 @Injectable({ providedIn: 'root' })
 export class ToursViewModel {
-  tours = signal<Tour[]>([
-    {
-      id: '1',
-      name: 'Berlin City Tour',
-      description: 'Historic landmarks',
-      from: 'Alexanderplatz',
-      to: 'Brandenburg Gate',
-      transportType: 'walk',
-      distance: 5,
-      estimatedTime: 120,
-      imageUrl: 'https://picsum.photos/seed/berlin-tour/800/400',
-    },
-    {
-      id: '2',
-      name: 'Munich to Neuschwanstein',
-      description: 'Fairytale castle',
-      from: 'Munich Hauptbahnhof',
-      to: 'Neuschwanstein Castle',
-      transportType: 'car',
-      distance: 120,
-      estimatedTime: 480,
-      imageUrl: 'https://picsum.photos/seed/munich-tour/800/400',
-    },
-    {
-      id: '3',
-      name: 'Riverside Walk',
-      description: 'Scenic path',
-      from: 'Central Bridge',
-      to: 'Marina Park',
-      transportType: 'bike',
-      distance: 15,
-      estimatedTime: 90,
-      imageUrl: 'https://picsum.photos/seed/riverside-tour/800/400',
-    },
-  ]);
+  private api = inject(TourApiService);
 
-  tourLogs = signal<TourLog[]>([
-    { id: 'l1', tourId: '1', dateTime: '2024-03-15T10:00', comment: 'Great weather, enjoyed the walk!', difficulty: 2, totalDistance: 5.2, totalTime: 130, rating: 5 },
-    { id: 'l2', tourId: '1', dateTime: '2024-04-01T09:30', comment: 'A bit crowded but still fun.', difficulty: 1, totalDistance: 4.8, totalTime: 110, rating: 4 },
-    { id: 'l3', tourId: '2', dateTime: '2024-02-20T08:00', comment: 'Long drive but worth it.', difficulty: 3, totalDistance: 122, totalTime: 500, rating: 5 },
-  ]);
-
+  tours = signal<Tour[]>([]);
+  tourLogs = signal<TourLog[]>([]);
   selectedTourId = signal<string | null>(null);
 
-  /** Tours enriched with computed popularity and childFriendliness. */
+  // ── Tours ──────────────────────────────────────────────
+
+  loadTours(): void {
+    this.api.getTours().subscribe(tours => this.tours.set(tours));
+  }
+
+  addTour(tour: Tour): void {
+    this.api.createTour(tour).subscribe(created =>
+      this.tours.update(ts => [...ts, created])
+    );
+  }
+
+  updateTour(updated: Tour): void {
+    this.api.updateTour(updated.id!, updated).subscribe(saved =>
+      this.tours.update(ts => ts.map(t => t.id === saved.id ? saved : t))
+    );
+  }
+
+  deleteTour(id: string): void {
+    this.api.deleteTour(id).subscribe(() => {
+      this.tours.update(ts => ts.filter(t => t.id !== id));
+      if (this.selectedTourId() === id) this.selectedTourId.set(null);
+    });
+  }
+
+  selectTour(tour: Tour): void {
+    this.selectedTourId.set(tour.id ?? null);
+    this.api.getLogsByTourId(tour.id!).subscribe(logs => this.tourLogs.set(logs));
+  }
+
+  // ── Tour Logs ──────────────────────────────────────────
+
+  addTourLog(log: TourLog): void {
+    this.api.createLog(log).subscribe(created =>
+      this.tourLogs.update(ls => [...ls, created])
+    );
+  }
+
+  updateTourLog(updated: TourLog): void {
+    this.api.updateLog(updated.id!, updated).subscribe(saved =>
+      this.tourLogs.update(ls => ls.map(l => l.id === saved.id ? saved : l))
+    );
+  }
+
+  deleteTourLog(id: string): void {
+    this.api.deleteLog(id).subscribe(() =>
+      this.tourLogs.update(ls => ls.filter(l => l.id !== id))
+    );
+  }
+
+  // ── Computed ───────────────────────────────────────────
+
   toursWithStats = computed(() => {
     const logs = this.tourLogs();
     return this.tours().map(tour => {
@@ -62,7 +76,6 @@ export class ToursViewModel {
       const avgDistance   = tourLogs.reduce((s, l) => s + l.totalDistance, 0) / tourLogs.length;
       const avgTime       = tourLogs.reduce((s, l) => s + l.totalTime, 0) / tourLogs.length;
 
-      // Higher difficulty, longer distance, longer time → less child-friendly
       const childFriendliness = Math.min(5, Math.max(1, Math.round(
         (6 - avgDifficulty)
         - (avgDistance > 30 ? 1 : 0)
@@ -82,31 +95,4 @@ export class ToursViewModel {
     if (!id) return [];
     return this.tourLogs().filter(log => log.tourId === id);
   });
-
-  selectTour(tour: Tour): void {
-    this.selectedTourId.set(tour.id ?? null);
-  }
-
-  updateTour(updated: Tour): void {
-    this.tours.update(tours => tours.map(t => t.id === updated.id ? updated : t));
-  }
-
-  deleteTour(id: string): void {
-    this.tours.update(tours => tours.filter(t => t.id !== id));
-    if (this.selectedTourId() === id) {
-      this.selectedTourId.set(null);
-    }
-  }
-
-  addTourLog(log: TourLog): void {
-    this.tourLogs.update(logs => [...logs, { ...log, id: crypto.randomUUID() }]);
-  }
-
-  updateTourLog(updated: TourLog): void {
-    this.tourLogs.update(logs => logs.map(l => l.id === updated.id ? updated : l));
-  }
-
-  deleteTourLog(id: string): void {
-    this.tourLogs.update(logs => logs.filter(l => l.id !== id));
-  }
 }
