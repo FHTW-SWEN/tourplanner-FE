@@ -1,0 +1,23 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+/* Fix: Tailwind v4 preflight sets max-width:100% on img, which breaks Leaflet tiles */
+.leaflet-container img {
+  max-width: none;
+  max-height: none;
+}
+
+@theme {
+  /* Primary - pastel pink */
+  --color-primary: #f9c4d4;
+  --color-primary-hover: #f5b0c4;
+  --color-primary-light: #fcdce4;
+  --color-primary-bg: #fff0f5;
+
+  /* Secondary - warm gray */
+  --color-secondary: #b8a99a;
+  --color-secondary-hover: #9c8f82;
+  --color-secondary-light: #d4c9bf;
+}

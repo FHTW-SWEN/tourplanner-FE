@@ -1,0 +1,32 @@
+<div class="flex flex-col gap-2">
+  <div class="flex items-center justify-between">
+    <h3 class="text-base font-semibold text-secondary">Tour Logs</h3>
+    <button
+      class="rounded bg-[#1e3a5f] px-3 py-1 text-xs font-medium text-white hover:bg-[#16304f]"
+      (click)="openAdd()"
+      type="button"
+    >
+      + Add Log
+    </button>
+  </div>
+
+  @if (vm.logsForSelectedTour().length === 0) {
+    <p class="text-sm text-gray-400">No logs yet. Add the first one!</p>
+  } @else {
+    @for (log of vm.logsForSelectedTour(); track log.id) {
+      <app-tour-log-card
+        [log]="log"
+        (edit)="openEdit($event)"
+        (delete)="handleDelete($event)"
+      />
+    }
+  }
+</div>
+
+<app-add-tour-log-modal
+  [isOpen]="isModalOpen"
+  [tourId]="vm.selectedTour()?.id ?? ''"
+  [editLog]="editLog"
+  (close)="closeModal()"
+  (save)="handleSave($event)"
+/>

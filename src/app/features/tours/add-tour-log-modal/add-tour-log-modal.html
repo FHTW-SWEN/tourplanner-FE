@@ -1,0 +1,88 @@
+@if (isOpen) {
+  <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-black/50 p-4" (click)="closeModal()">
+    <div class="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl" (click)="$event.stopPropagation()">
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-xl font-semibold">{{ editLog ? 'Edit Tour Log' : 'Add Tour Log' }}</h2>
+        <button class="text-gray-500 hover:text-gray-700" (click)="closeModal()" type="button">✕</button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-slate-700">Date & Time *</label>
+          <input
+            type="datetime-local"
+            formControlName="dateTime"
+            class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+          />
+        </div>
+
+        <div class="mb-3">
+          <label class="block text-sm font-medium text-slate-700">Comment</label>
+          <textarea
+            formControlName="comment"
+            rows="3"
+            class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+          ></textarea>
+        </div>
+
+        <div class="mb-3 grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Total Distance (km) *</label>
+            <input
+              type="number"
+              min="0"
+              step="0.1"
+              formControlName="totalDistance"
+              class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Total Time (min) *</label>
+            <input
+              type="number"
+              min="0"
+              formControlName="totalTime"
+              class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm"
+            />
+          </div>
+        </div>
+
+        <div class="mb-3 grid grid-cols-2 gap-3">
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Difficulty *</label>
+            <select formControlName="difficulty" class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm">
+              <option [ngValue]="1">1 – Easy</option>
+              <option [ngValue]="2">2 – Moderate</option>
+              <option [ngValue]="3">3 – Hard</option>
+              <option [ngValue]="4">4 – Very Hard</option>
+              <option [ngValue]="5">5 – Extreme</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-slate-700">Rating *</label>
+            <select formControlName="rating" class="mt-1 w-full rounded border border-slate-300 px-3 py-2 text-sm">
+              <option [ngValue]="1">★☆☆☆☆</option>
+              <option [ngValue]="2">★★☆☆☆</option>
+              <option [ngValue]="3">★★★☆☆</option>
+              <option [ngValue]="4">★★★★☆</option>
+              <option [ngValue]="5">★★★★★</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2">
+          <button type="button" class="rounded border border-slate-300 px-4 py-2 text-sm" (click)="closeModal()">
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="rounded bg-[#1e3a5f] px-4 py-2 text-sm font-medium text-white hover:bg-[#16304f]"
+            [disabled]="form.invalid"
+          >
+            Save Log
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
