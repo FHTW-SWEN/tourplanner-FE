@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-header',
@@ -6,9 +7,9 @@ import { Component } from '@angular/core';
   templateUrl: './header.html',
 })
 export class Header {
-  protected readonly userName = 'Max Mustermann';
+  protected authService = inject(AuthService);
 
   protected onLogout(): void {
-    // TODO: implement logout
+    this.authService.logout();
   }
 }

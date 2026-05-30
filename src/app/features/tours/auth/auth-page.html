@@ -1,0 +1,66 @@
+<div class="flex min-h-screen items-center justify-center bg-secondary-light p-4">
+  <div class="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
+
+    <h1 class="mb-2 text-center text-2xl font-bold text-primary">TourPlanner</h1>
+    <p class="mb-6 text-center text-sm text-gray-500">
+      {{ isLoginMode ? 'Sign in to your account' : 'Create a new account' }}
+    </p>
+
+    @if (successMessage) {
+      <div class="mb-4 rounded-lg bg-green-50 p-3 text-sm text-green-700">
+        {{ successMessage }}
+      </div>
+    }
+
+    @if (errorMessage) {
+      <div class="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+        {{ errorMessage }}
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" novalidate class="space-y-4">
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Username</label>
+        <input
+          formControlName="username"
+          type="text"
+          placeholder="Enter username"
+          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none"
+          [class.border-red-400]="usernameControl.invalid && usernameControl.touched"
+        />
+        @if (usernameControl.invalid && usernameControl.touched) {
+          <p class="mt-1 text-xs text-red-500">Username must be at least 3 characters.</p>
+        }
+      </div>
+
+      <div>
+        <label class="mb-1 block text-sm font-medium text-gray-700">Password</label>
+        <input
+          formControlName="password"
+          type="password"
+          placeholder="Enter password"
+          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none"
+          [class.border-red-400]="passwordControl.invalid && passwordControl.touched"
+        />
+        @if (passwordControl.invalid && passwordControl.touched) {
+          <p class="mt-1 text-xs text-red-500">Password must be at least 6 characters.</p>
+        }
+      </div>
+
+      <button
+        type="submit"
+        class="w-full rounded-lg bg-primary-dark py-2 text-sm font-medium text-white hover:opacity-90"
+      >
+        {{ isLoginMode ? 'Sign In' : 'Create Account' }}
+      </button>
+    </form>
+
+    <p class="mt-4 text-center text-sm text-gray-500">
+      {{ isLoginMode ? "Don't have an account?" : 'Already have an account?' }}
+      <button (click)="toggleMode()" class="ml-1 font-medium text-primary hover:underline">
+        {{ isLoginMode ? 'Register' : 'Sign In' }}
+      </button>
+    </p>
+
+  </div>
+</div>
