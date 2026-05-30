@@ -115,3 +115,4 @@ export class LeafletMapFacade {
     this.map = null;
   }
 }
+
