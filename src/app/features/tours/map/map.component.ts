@@ -8,11 +8,15 @@ import {
   effect,
 } from '@angular/core';
 import { LeafletMapFacade } from '../../../core/services/leaflet-map-facade.service';
-import { NominatimGeocodeService } from '../../../core/services/nominatim-geocode.service';
-import { OpenRouteService, OrsResult } from '../../../core/services/open-route.service';
 import { ToursViewModel } from '../tours.viewmodel';
-import { concatMap, of } from 'rxjs';
 
+/**
+ * Rendert eine Leaflet-Karte für die aktuell ausgewählte Tour.
+ *
+ * Die Routenkoordinaten kommen fertig vom Backend (ORS Directions API) —
+ * das Frontend macht KEINEN direkten ORS- oder Geocoding-Call mehr.
+ * Leaflet zeichnet nur die empfangenen Koordinaten als Polyline.
+ */
 @Component({
   selector: 'app-map',
   standalone: true,
@@ -25,40 +29,24 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef<HTMLElement>;
 
   private readonly mapFacade = inject(LeafletMapFacade);
-  private readonly geocode = inject(NominatimGeocodeService);
-  private readonly ors = inject(OpenRouteService);
   private readonly vm = inject(ToursViewModel);
 
   constructor() {
     effect(() => {
       const tour = this.vm.selectedTour();
+
       if (!tour) {
         this.mapFacade.clearAll();
         return;
       }
 
-      const sub = this.geocode.geocodeFromTo(tour.from, tour.to).pipe(
-        concatMap(({ fromCoords, toCoords }: { fromCoords: [number,number]|null, toCoords: [number,number]|null }) => {
-          if (!fromCoords || !toCoords) {
-            return of({ fromCoords, toCoords, orsResult: null as OrsResult | null });
-          }
-          return this.ors.getRoute(fromCoords, toCoords, tour.transportType).pipe(
-            concatMap((orsResult: OrsResult | null) => of({ fromCoords, toCoords, orsResult }))
-          );
-        })
-      ).subscribe({
-        next: ({ fromCoords, toCoords, orsResult }) => {
-          this.drawRouteWhenReady(
-            tour.from,
-            tour.to,
-            fromCoords,
-            toCoords,
-            orsResult?.coordinates ?? null,
-          );
-        },
-      });
+      if (!tour.routeCoordinates) {
+        this.mapFacade.clearAll();
+        this.mapFacade.setView(48.2082, 16.3738, 10);
+        return;
+      }
 
-      return () => sub.unsubscribe();
+      this.drawRouteFromCoordinates(tour.from, tour.to, tour.routeCoordinates);
     });
   }
 
@@ -74,12 +62,14 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.mapFacade.destroy();
   }
 
-  private drawRouteWhenReady(
+  /**
+   * Parst die routeCoordinates vom Backend und zeichnet sie als Leaflet-Polyline.
+   * Format: "[[lat,lng],[lat,lng],...]"
+   */
+  private drawRouteFromCoordinates(
     fromLabel: string,
     toLabel: string,
-    fromCoords: [number, number] | null,
-    toCoords: [number, number] | null,
-    routeCoordinates: [number, number][] | null,
+    routeCoordinatesJson: string,
   ): void {
     const apply = () => {
       if (!this.mapFacade.isMapReady()) {
@@ -89,24 +79,23 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
       this.mapFacade.clearAll();
 
-      let a = fromCoords;
-      let b = toCoords;
-
-      if (a && !b) b = [a[0] + 0.04, a[1] + 0.04];
-      if (!a && b) a = [b[0] - 0.04, b[1] - 0.04];
-      if (!a || !b) {
-        a = [48.2082, 16.3738];
-        b = [48.2482, 16.4138];
+      let coords: [number, number][];
+      try {
+        coords = JSON.parse(routeCoordinatesJson) as [number, number][];
+      } catch {
+        console.error('Ungültiges routeCoordinates Format:', routeCoordinatesJson);
+        return;
       }
 
-      this.mapFacade.addMarker(a[0], a[1], `Start: ${fromLabel}`);
-      this.mapFacade.addMarker(b[0], b[1], `Destination: ${toLabel}`);
+      if (!coords || coords.length < 2) return;
 
-      const coords = routeCoordinates && routeCoordinates.length >= 2
-        ? routeCoordinates
-        : [a, b];
+      const first = coords[0];
+      const last = coords[coords.length - 1];
+      this.mapFacade.addMarker(first[0], first[1], `Start: ${fromLabel}`);
+      this.mapFacade.addMarker(last[0], last[1], `Ziel: ${toLabel}`);
 
       this.mapFacade.drawRoute(coords);
+
       queueMicrotask(() => this.mapFacade.invalidateSize());
     };
 

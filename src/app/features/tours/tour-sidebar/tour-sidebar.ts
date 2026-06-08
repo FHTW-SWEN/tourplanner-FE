@@ -3,9 +3,6 @@ import { TourList } from '../tour-list/tour-list';
 import { AddTourModal, TourPayload } from '../add-tour-modal/add-tour-modal';
 import { ToursViewModel } from '../tours.viewmodel';
 import type { Tour } from '../../../core/models/index';
-import { NominatimGeocodeService } from '../../../core/services/nominatim-geocode.service';
-import { OpenRouteService, OrsResult } from '../../../core/services/open-route.service';
-import { concatMap, of } from 'rxjs';
 
 @Component({
   selector: 'app-tour-sidebar',
@@ -16,8 +13,6 @@ import { concatMap, of } from 'rxjs';
 })
 export class TourSidebar {
   private vm = inject(ToursViewModel);
-  private geocode = inject(NominatimGeocodeService);
-  private ors = inject(OpenRouteService);
 
   isModalOpen = false;
   editingTour: Tour | null = null;
@@ -40,39 +35,29 @@ export class TourSidebar {
   handleSaveTour(payload: TourPayload): void {
     const imageUrl = payload.imageUrl?.trim() || undefined;
 
-    this.geocode.geocodeFromTo(payload.from, payload.to).pipe(
-      concatMap(({ fromCoords, toCoords }: { fromCoords: [number,number]|null, toCoords: [number,number]|null }) => {
-        if (!fromCoords || !toCoords) return of(null as OrsResult | null);
-        return this.ors.getRoute(fromCoords, toCoords, payload.transport);
-      })
-    ).subscribe((orsResult: OrsResult | null) => {
-      const distance = orsResult?.distance ?? 0;
-      const estimatedTime = orsResult?.estimatedTime ?? 0;
+    if (this.editingTour) {
+      this.vm.updateTour({
+        ...this.editingTour,
+        name: payload.name,
+        description: payload.description,
+        from: payload.from,
+        to: payload.to,
+        transportType: payload.transport,
+        imageUrl,
+      });
+    } else {
+      this.vm.addTour({
+        name: payload.name,
+        description: payload.description,
+        from: payload.from,
+        to: payload.to,
+        transportType: payload.transport,
+        distance: 0,
+        estimatedTime: 0,
+        ...(imageUrl ? { imageUrl } : {}),
+      });
+    }
 
-      if (this.editingTour) {
-        this.vm.updateTour({
-          ...this.editingTour,
-          name: payload.name,
-          description: payload.description,
-          from: payload.from,
-          to: payload.to,
-          transportType: payload.transport,
-          distance,
-          estimatedTime,
-          imageUrl,
-        });
-      } else {
-        this.vm.addTour({
-          name: payload.name,
-          description: payload.description,
-          from: payload.from,
-          to: payload.to,
-          transportType: payload.transport,
-          distance,
-          estimatedTime,
-          ...(imageUrl ? { imageUrl } : {}),
-        });
-      }
-    });
+    this.closeModal();
   }
 }
