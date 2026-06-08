@@ -5,12 +5,19 @@ export interface Tour {
   from: string;
   to: string;
   transportType: string;
+  /** Distanz in km — wird vom Backend via ORS befüllt, nicht vom User eingegeben. */
   distance: number;
+  /** Geschätzte Zeit in Minuten — wird vom Backend via ORS befüllt. */
   estimatedTime: number;
-  /** Path/URL to the tour image stored on the server filesystem. */
+  /**
+   * Route-Koordinaten als JSON-String: "[[lat,lng],[lat,lng],...]"
+   * Kommt vom Backend (ORS Directions API), wird von Leaflet gerendert.
+   */
+  routeCoordinates?: string;
+  /** Pfad/URL zum Tour-Bild auf dem Server-Filesystem. */
   imageUrl?: string;
-  /** Computed: derived from number of tour logs. */
+  /** Computed: abgeleitet aus der Anzahl der Tour-Logs. */
   popularity?: number;
-  /** Computed: derived from difficulty, total time and distance of logs. */
+  /** Computed: abgeleitet aus Schwierigkeit, Zeit und Distanz der Logs. */
   childFriendliness?: number;
 }
