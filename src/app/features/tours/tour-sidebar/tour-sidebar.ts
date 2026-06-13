@@ -38,20 +38,27 @@ export class TourSidebar {
   }
 
   handleSaveTour(payload: TourPayload): void {
+    const editingTour = this.editingTour;
     const imageUrl = payload.imageUrl?.trim() || undefined;
 
     this.geocode.geocodeFromTo(payload.from, payload.to).pipe(
-      concatMap(({ fromCoords, toCoords }: { fromCoords: [number,number]|null, toCoords: [number,number]|null }) => {
+      concatMap(({
+        fromCoords,
+        toCoords,
+      }: {
+        fromCoords: [number, number] | null;
+        toCoords: [number, number] | null;
+      }) => {
         if (!fromCoords || !toCoords) return of(null as OrsResult | null);
         return this.ors.getRoute(fromCoords, toCoords, payload.transport);
-      })
+      }),
     ).subscribe((orsResult: OrsResult | null) => {
       const distance = orsResult?.distance ?? 0;
       const estimatedTime = orsResult?.estimatedTime ?? 0;
 
-      if (this.editingTour) {
+      if (editingTour) {
         this.vm.updateTour({
-          ...this.editingTour,
+          ...editingTour,
           name: payload.name,
           description: payload.description,
           from: payload.from,

@@ -18,10 +18,12 @@ export class OpenRouteService {
   /**
    * Maps our transport type to ORS profile.
    */
-  private getProfile(transportType: string): string {
+  private getProfile(transportType: string): string | null {
     switch (transportType) {
       case 'bike':    return 'cycling-regular';
       case 'car':     return 'driving-car';
+      case 'public_transport':
+        return null;
       case 'walk':
       default:        return 'foot-walking';
     }
@@ -37,10 +39,16 @@ export class OpenRouteService {
     transportType: string,
   ): Observable<OrsResult | null> {
     const profile = this.getProfile(transportType);
+    const apiKey = environment.orsApiKey?.trim();
+
+    if (!profile || !apiKey) {
+      return of(null);
+    }
+
     const url = `${this.baseUrl}/${profile}/geojson`;
 
     const headers = new HttpHeaders({
-      'Authorization': environment.orsApiKey,
+      'Authorization': apiKey,
       'Content-Type': 'application/json',
     });
 
