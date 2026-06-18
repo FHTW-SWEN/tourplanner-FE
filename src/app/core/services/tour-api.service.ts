@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Tour, TourLog } from '../models/index';
+import { ImportResult, Tour, TourDataExport, TourLog } from '../models/index';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -24,6 +24,14 @@ export class TourApiService {
 
   deleteTour(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/tours/${id}`);
+  }
+
+  exportTourData(): Observable<TourDataExport> {
+    return this.http.get<TourDataExport>(`${this.base}/tours/export`);
+  }
+
+  importTourData(data: TourDataExport): Observable<ImportResult> {
+    return this.http.post<ImportResult>(`${this.base}/tours/import`, data);
   }
 
   // Tour Logs
