@@ -22,6 +22,7 @@
       <div>
         <label class="mb-1 block text-sm font-medium text-gray-700">Username</label>
         <input
+          id="username"
           formControlName="username"
           type="text"
           placeholder="Enter username"
@@ -36,6 +37,7 @@
       <div>
         <label class="mb-1 block text-sm font-medium text-gray-700">Password</label>
         <input
+          id="password"
           formControlName="password"
           type="password"
           placeholder="Enter password"
@@ -49,7 +51,7 @@
 
       <button
         type="submit"
-        class="w-full rounded-lg bg-primary-dark py-2 text-sm font-medium text-white hover:opacity-90"
+        class="w-full rounded-lg bg-primary py-2 text-sm font-medium text-white hover:opacity-90"
       >
         {{ isLoginMode ? 'Sign In' : 'Create Account' }}
       </button>
