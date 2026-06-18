@@ -16,37 +16,55 @@ export class TourSidebar {
 
   isModalOpen = false;
   editingTour: Tour | null = null;
+  saveTourError = '';
 
   openAddTourModal(): void {
     this.editingTour = null;
+    this.saveTourError = '';
     this.isModalOpen = true;
   }
 
   openEditTourModal(tour: Tour): void {
     this.editingTour = tour;
+    this.saveTourError = '';
     this.isModalOpen = true;
   }
 
   closeModal(): void {
     this.isModalOpen = false;
     this.editingTour = null;
+    this.saveTourError = '';
   }
 
   handleSaveTour(payload: TourPayload): void {
+    this.saveTourError = '';
+
     const imageUrl = payload.imageUrl?.trim() || undefined;
 
+    const onSuccess = () => this.closeModal();
+    const onError = () => {
+      this.saveTourError = 'Failed to save tour. Please check the route and try again.';
+    };
+
     if (this.editingTour) {
-      this.vm.updateTour({
-        ...this.editingTour,
-        name: payload.name,
-        description: payload.description,
-        from: payload.from,
-        to: payload.to,
-        transportType: payload.transport,
-        imageUrl,
-      });
-    } else {
-      this.vm.addTour({
+      this.vm.updateTour(
+        {
+          ...this.editingTour,
+          name: payload.name,
+          description: payload.description,
+          from: payload.from,
+          to: payload.to,
+          transportType: payload.transport,
+          imageUrl,
+        },
+        onSuccess,
+        onError
+      );
+      return;
+    }
+
+    this.vm.addTour(
+      {
         name: payload.name,
         description: payload.description,
         from: payload.from,
@@ -55,9 +73,9 @@ export class TourSidebar {
         distance: 0,
         estimatedTime: 0,
         ...(imageUrl ? { imageUrl } : {}),
-      });
-    }
-
-    this.closeModal();
+      },
+      onSuccess,
+      onError
+    );
   }
 }

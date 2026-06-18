@@ -16,16 +16,32 @@ export class ToursViewModel {
     this.api.getTours().subscribe(tours => this.tours.set(tours));
   }
 
-  addTour(tour: Tour): void {
-    this.api.createTour(tour).subscribe(created =>
-      this.tours.update(ts => [...ts, created])
-    );
+  addTour(tour: Tour, onSuccess?: () => void, onError?: () => void): void {
+    this.api.createTour(tour).subscribe({
+      next: created => {
+        console.log('Save tour succeeded', created);
+        this.tours.update(ts => [...ts, created]);
+        onSuccess?.();
+      },
+      error: error => {
+        console.error('Save tour failed', error);
+        onError?.();
+      },
+    });
   }
 
-  updateTour(updated: Tour): void {
-    this.api.updateTour(updated.id!, updated).subscribe(saved =>
-      this.tours.update(ts => ts.map(t => t.id === saved.id ? saved : t))
-    );
+  updateTour(updated: Tour, onSuccess?: () => void, onError?: () => void): void {
+    this.api.updateTour(updated.id!, updated).subscribe({
+      next: saved => {
+        console.log('Save tour succeeded', saved);
+        this.tours.update(ts => ts.map(t => t.id === saved.id ? saved : t));
+        onSuccess?.();
+      },
+      error: error => {
+        console.error('Save tour failed', error);
+        onError?.();
+      },
+    });
   }
 
   deleteTour(id: string): void {
