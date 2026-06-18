@@ -13,6 +13,7 @@
   <app-add-tour-modal
     [isOpen]="isModalOpen"
     [editTour]="editingTour"
+    [errorMessage]="saveTourError"
     (close)="closeModal()"
     (save)="handleSaveTour($event)"
   ></app-add-tour-modal>
