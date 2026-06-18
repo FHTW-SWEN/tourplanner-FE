@@ -13,6 +13,7 @@ import type { Tour } from '../../../core/models/index';
 })
 export class TourSidebar {
   private vm = inject(ToursViewModel);
+
   isModalOpen = false;
   editingTour: Tour | null = null;
 
@@ -30,12 +31,11 @@ export class TourSidebar {
     this.isModalOpen = false;
     this.editingTour = null;
   }
-  
+
   handleSaveTour(payload: TourPayload): void {
     const imageUrl = payload.imageUrl?.trim() || undefined;
 
     if (this.editingTour) {
-      // Edit -> call API
       this.vm.updateTour({
         ...this.editingTour,
         name: payload.name,
@@ -46,7 +46,6 @@ export class TourSidebar {
         imageUrl,
       });
     } else {
-      // Create -> call API
       this.vm.addTour({
         name: payload.name,
         description: payload.description,
@@ -58,5 +57,7 @@ export class TourSidebar {
         ...(imageUrl ? { imageUrl } : {}),
       });
     }
- }
+
+    this.closeModal();
+  }
 }

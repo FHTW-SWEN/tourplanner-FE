@@ -8,12 +8,14 @@ import {
   effect,
 } from '@angular/core';
 import { LeafletMapFacade } from '../../../core/services/leaflet-map-facade.service';
-import { NominatimGeocodeService } from '../../../core/services/nominatim-geocode.service';
 import { ToursViewModel } from '../tours.viewmodel';
 
 /**
- * Renders a Leaflet map for the currently selected tour.
- * Start/end are geocoded from tour.from / tour.to (Nominatim); line is a straight segment (demo).
+ * Rendert eine Leaflet-Karte für die aktuell ausgewählte Tour.
+ *
+ * Die Routenkoordinaten kommen fertig vom Backend (ORS Directions API) —
+ * das Frontend macht KEINEN direkten ORS- oder Geocoding-Call mehr.
+ * Leaflet zeichnet nur die empfangenen Koordinaten als Polyline.
  */
 @Component({
   selector: 'app-map',
@@ -27,29 +29,29 @@ export class MapComponent implements AfterViewInit, OnDestroy {
   @ViewChild('mapContainer', { static: true }) mapContainer!: ElementRef<HTMLElement>;
 
   private readonly mapFacade = inject(LeafletMapFacade);
-  private readonly geocode = inject(NominatimGeocodeService);
   private readonly vm = inject(ToursViewModel);
 
   constructor() {
     effect(() => {
       const tour = this.vm.selectedTour();
+
       if (!tour) {
         this.mapFacade.clearAll();
         return;
       }
 
-      const sub = this.geocode.geocodeFromTo(tour.from, tour.to).subscribe({
-        next: ({ fromCoords, toCoords }) =>
-          this.drawRouteWhenReady(tour.from, tour.to, fromCoords, toCoords),
-      });
+      if (!tour.routeCoordinates) {
+        this.mapFacade.clearAll();
+        this.mapFacade.setView(48.2082, 16.3738, 10);
+        return;
+      }
 
-      return () => sub.unsubscribe();
+      this.drawRouteFromCoordinates(tour.from, tour.to, tour.routeCoordinates);
     });
   }
 
   ngAfterViewInit(): void {
     this.mapFacade.initMap(this.mapContainer.nativeElement);
-
     requestAnimationFrame(() => {
       this.mapFacade.invalidateSize();
       setTimeout(() => this.mapFacade.invalidateSize(), 200);
@@ -60,11 +62,14 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     this.mapFacade.destroy();
   }
 
-  private drawRouteWhenReady(
+  /**
+   * Parst die routeCoordinates vom Backend und zeichnet sie als Leaflet-Polyline.
+   * Format: "[[lat,lng],[lat,lng],...]"
+   */
+  private drawRouteFromCoordinates(
     fromLabel: string,
     toLabel: string,
-    fromCoords: [number, number] | null,
-    toCoords: [number, number] | null,
+    routeCoordinatesJson: string,
   ): void {
     const apply = () => {
       if (!this.mapFacade.isMapReady()) {
@@ -74,22 +79,23 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
       this.mapFacade.clearAll();
 
-      let a = fromCoords;
-      let b = toCoords;
-      if (a && !b) {
-        b = [a[0] + 0.04, a[1] + 0.04];
-      }
-      if (!a && b) {
-        a = [b[0] - 0.04, b[1] - 0.04];
-      }
-      if (!a || !b) {
-        a = [52.52, 13.405];
-        b = [52.55, 13.45];
+      let coords: [number, number][];
+      try {
+        coords = JSON.parse(routeCoordinatesJson) as [number, number][];
+      } catch {
+        console.error('Ungültiges routeCoordinates Format:', routeCoordinatesJson);
+        return;
       }
 
-      this.mapFacade.addMarker(a[0], a[1], `Start: ${fromLabel}`);
-      this.mapFacade.addMarker(b[0], b[1], `Destination: ${toLabel}`);
-      this.mapFacade.drawRoute([a, b]);
+      if (!coords || coords.length < 2) return;
+
+      const first = coords[0];
+      const last = coords[coords.length - 1];
+      this.mapFacade.addMarker(first[0], first[1], `Start: ${fromLabel}`);
+      this.mapFacade.addMarker(last[0], last[1], `Ziel: ${toLabel}`);
+
+      this.mapFacade.drawRoute(coords);
+
       queueMicrotask(() => this.mapFacade.invalidateSize());
     };
 
