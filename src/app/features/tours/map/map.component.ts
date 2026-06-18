@@ -9,10 +9,12 @@ import {
 } from '@angular/core';
 import { LeafletMapFacade } from '../../../core/services/leaflet-map-facade.service';
 import { NominatimGeocodeService } from '../../../core/services/nominatim-geocode.service';
-import { OpenRouteService, OrsResult } from '../../../core/services/open-route.service';
 import { ToursViewModel } from '../tours.viewmodel';
-import { concatMap, of } from 'rxjs';
 
+/**
+ * Renders a Leaflet map for the currently selected tour.
+ * Start/end are geocoded from tour.from / tour.to (Nominatim); line is a straight segment (demo).
+ */
 @Component({
   selector: 'app-map',
   standalone: true,
@@ -26,7 +28,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   private readonly mapFacade = inject(LeafletMapFacade);
   private readonly geocode = inject(NominatimGeocodeService);
-  private readonly ors = inject(OpenRouteService);
   private readonly vm = inject(ToursViewModel);
 
   constructor() {
@@ -37,25 +38,9 @@ export class MapComponent implements AfterViewInit, OnDestroy {
         return;
       }
 
-      const sub = this.geocode.geocodeFromTo(tour.from, tour.to).pipe(
-        concatMap(({ fromCoords, toCoords }: { fromCoords: [number,number]|null, toCoords: [number,number]|null }) => {
-          if (!fromCoords || !toCoords) {
-            return of({ fromCoords, toCoords, orsResult: null as OrsResult | null });
-          }
-          return this.ors.getRoute(fromCoords, toCoords, tour.transportType).pipe(
-            concatMap((orsResult: OrsResult | null) => of({ fromCoords, toCoords, orsResult }))
-          );
-        })
-      ).subscribe({
-        next: ({ fromCoords, toCoords, orsResult }) => {
-          this.drawRouteWhenReady(
-            tour.from,
-            tour.to,
-            fromCoords,
-            toCoords,
-            orsResult?.coordinates ?? null,
-          );
-        },
+      const sub = this.geocode.geocodeFromTo(tour.from, tour.to).subscribe({
+        next: ({ fromCoords, toCoords }) =>
+          this.drawRouteWhenReady(tour.from, tour.to, fromCoords, toCoords),
       });
 
       return () => sub.unsubscribe();
@@ -64,6 +49,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
   ngAfterViewInit(): void {
     this.mapFacade.initMap(this.mapContainer.nativeElement);
+
     requestAnimationFrame(() => {
       this.mapFacade.invalidateSize();
       setTimeout(() => this.mapFacade.invalidateSize(), 200);
@@ -79,7 +65,6 @@ export class MapComponent implements AfterViewInit, OnDestroy {
     toLabel: string,
     fromCoords: [number, number] | null,
     toCoords: [number, number] | null,
-    routeCoordinates: [number, number][] | null,
   ): void {
     const apply = () => {
       if (!this.mapFacade.isMapReady()) {
@@ -91,22 +76,20 @@ export class MapComponent implements AfterViewInit, OnDestroy {
 
       let a = fromCoords;
       let b = toCoords;
-
-      if (a && !b) b = [a[0] + 0.04, a[1] + 0.04];
-      if (!a && b) a = [b[0] - 0.04, b[1] - 0.04];
+      if (a && !b) {
+        b = [a[0] + 0.04, a[1] + 0.04];
+      }
+      if (!a && b) {
+        a = [b[0] - 0.04, b[1] - 0.04];
+      }
       if (!a || !b) {
-        a = [48.2082, 16.3738];
-        b = [48.2482, 16.4138];
+        a = [52.52, 13.405];
+        b = [52.55, 13.45];
       }
 
       this.mapFacade.addMarker(a[0], a[1], `Start: ${fromLabel}`);
       this.mapFacade.addMarker(b[0], b[1], `Destination: ${toLabel}`);
-
-      const coords = routeCoordinates && routeCoordinates.length >= 2
-        ? routeCoordinates
-        : [a, b];
-
-      this.mapFacade.drawRoute(coords);
+      this.mapFacade.drawRoute([a, b]);
       queueMicrotask(() => this.mapFacade.invalidateSize());
     };
 

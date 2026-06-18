@@ -10,7 +10,7 @@ export class ToursViewModel {
   tourLogs = signal<TourLog[]>([]);
   selectedTourId = signal<string | null>(null);
 
-  //  Tours 
+  // ── Tours ──────────────────────────────────────────────
 
   loadTours(): void {
     this.api.getTours().subscribe(tours => this.tours.set(tours));
@@ -40,7 +40,7 @@ export class ToursViewModel {
     this.api.getLogsByTourId(tour.id!).subscribe(logs => this.tourLogs.set(logs));
   }
 
-  // Tour Logs 
+  // ── Tour Logs ──────────────────────────────────────────
 
   addTourLog(log: TourLog): void {
     this.api.createLog(log).subscribe(created =>
@@ -60,7 +60,7 @@ export class ToursViewModel {
     );
   }
 
-  // Computed 
+  // ── Computed ───────────────────────────────────────────
 
   toursWithStats = computed(() => {
     const logs = this.tourLogs();
