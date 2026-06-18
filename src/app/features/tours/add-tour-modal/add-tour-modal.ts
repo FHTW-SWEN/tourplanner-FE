@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import type { Tour } from '../../../core/models/index';
@@ -19,33 +19,31 @@ export interface TourPayload {
   imports: [CommonModule, FormsModule],
   templateUrl: './add-tour-modal.html',
 })
-export class AddTourModal {
+export class AddTourModal implements OnChanges {
   readonly transportOptions = TRANSPORT_OPTIONS;
 
   @Input() isOpen = false;
   /** Pass a Tour to open the modal in Edit mode; null = Create mode. */
-  @Input() set editTour(tour: Tour | null) {
-    this.currentEditTour = tour;
-    this.form = tour
-      ? {
-          name: tour.name,
-          description: tour.description,
-          from: tour.from,
-          to: tour.to,
-          transport: tour.transportType,
-          imageUrl: tour.imageUrl ?? '',
-        }
-      : this.emptyForm();
-  }
-  get editTour(): Tour | null {
-    return this.currentEditTour;
-  }
-  @Input() errorMessage = '';
+  @Input() editTour: Tour | null = null;
   @Output() close = new EventEmitter<void>();
   @Output() save = new EventEmitter<TourPayload>();
 
-  private currentEditTour: Tour | null = null;
   form: TourPayload = this.emptyForm();
+
+  ngOnChanges(): void {
+    if (this.editTour) {
+      this.form = {
+        name: this.editTour.name,
+        description: this.editTour.description,
+        from: this.editTour.from,
+        to: this.editTour.to,
+        transport: this.editTour.transportType,
+        imageUrl: this.editTour.imageUrl ?? '',
+      };
+    } else {
+      this.form = this.emptyForm();
+    }
+  }
 
   private emptyForm(): TourPayload {
     return { name: '', description: '', from: '', to: '', transport: 'walk', imageUrl: '' };
@@ -66,5 +64,6 @@ export class AddTourModal {
   submitTour(form: NgForm): void {
     if (!form.valid) return;
     this.save.emit({ ...this.form });
+    this.closeModal();
   }
 }
