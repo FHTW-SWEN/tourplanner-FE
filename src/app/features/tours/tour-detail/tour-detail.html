@@ -2,14 +2,8 @@
   @if (vm.selectedTour(); as tour) {
     @if (tour.imageUrl) {
       <div class="relative h-44 w-full shrink-0 overflow-hidden bg-secondary-light md:h-52">
-        <img
-          [src]="tour.imageUrl"
-          [alt]="tour.name"
-          class="h-full w-full object-cover object-center"
-        />
-        <div
-          class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/10"
-        ></div>
+        <img [src]="tour.imageUrl" [alt]="tour.name" class="h-full w-full object-cover object-center" />
+        <div class="pointer-events-none absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/10"></div>
       </div>
     }
 
@@ -33,6 +27,7 @@
 
       <app-map />
       <app-tour-log-list />
+      <app-tour-photo-gallery />
     </div>
   } @else {
     <div class="flex h-full items-center justify-center p-4 text-sm text-gray-400">

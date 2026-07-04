@@ -1,13 +1,13 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { ImportResult, Tour, TourDataExport, TourLog } from '../models/index';
+import { ImportResult, Tour, TourDataExport, TourLog, TourPhoto } from '../models/index';
 import { environment } from '../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class TourApiService {
   private http = inject(HttpClient);
-  private base = environment.apiBaseUrl; // 'http://localhost:8080/api'
+  private base = environment.apiBaseUrl;
 
   // Tours
   getTours(): Observable<Tour[]> {
@@ -50,4 +50,21 @@ export class TourApiService {
   deleteLog(id: string): Observable<void> {
     return this.http.delete<void>(`${this.base}/logs/${id}`);
   }
+
+  // Tour Photos
+  getPhotos(tourId: string): Observable<TourPhoto[]> {
+    return this.http.get<TourPhoto[]>(`${this.base}/tours/${tourId}/photos`);
+  }
+
+  uploadPhoto(tourId: string, file: File, caption?: string): Observable<TourPhoto> {
+    const formData = new FormData();
+    formData.append('file', file);
+    if (caption) formData.append('caption', caption);
+    return this.http.post<TourPhoto>(`${this.base}/tours/${tourId}/photos`, formData);
+  }
+
+  deletePhoto(tourId: string, photoId: string): Observable<void> {
+    return this.http.delete<void>(`${this.base}/tours/${tourId}/photos/${photoId}`);
+  }
+  
 }
