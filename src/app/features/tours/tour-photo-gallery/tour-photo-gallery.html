@@ -39,7 +39,7 @@
 </div>
 
 @if (lightboxPhoto) {
-  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" (click)="closeLightbox()">
+  <div class="fixed inset-0 z-[2000] flex items-center justify-center bg-black/80 p-4" (click)="closeLightbox()">
     <img
       [src]="lightboxPhoto.dataUrl"
       [alt]="lightboxPhoto.caption || lightboxPhoto.fileName"
