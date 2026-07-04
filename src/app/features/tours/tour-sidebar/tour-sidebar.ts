@@ -14,7 +14,7 @@ import type { TourDataExport } from '../../../core/models/index';
   templateUrl: './tour-sidebar.html',
 })
 export class TourSidebar {
-  private vm = inject(ToursViewModel);
+  readonly vm = inject(ToursViewModel);
   private api = inject(TourApiService);
 
   @ViewChild('importFileInput') private importFileInput?: ElementRef<HTMLInputElement>;
@@ -35,6 +35,11 @@ export class TourSidebar {
   closeModal(): void {
     this.isModalOpen = false;
     this.editingTour = null;
+  }
+
+  onSearchInput(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    this.vm.setTourSearchQuery(input.value);
   }
 
   exportTours(): void {
