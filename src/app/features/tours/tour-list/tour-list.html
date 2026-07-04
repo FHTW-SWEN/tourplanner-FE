@@ -1,7 +1,21 @@
-@for (tour of vm.toursWithStats(); track tour.id) {
-  <tour-card
-    [tour]="tour"
-    (edit)="editTour.emit($event)"
-    (delete)="handleDelete($event)"
-  ></tour-card>
+@if (vm.tourListLoading()) {
+  <div class="rounded border border-secondary-light px-3 py-4 text-center text-sm text-gray-500">
+    Loading tours...
+  </div>
+} @else if (vm.toursWithStats().length === 0) {
+  <div class="rounded border border-secondary-light px-3 py-4 text-center text-sm text-gray-500">
+    @if (vm.tourSearchQuery().trim()) {
+      No tours found.
+    } @else {
+      No tours yet.
+    }
+  </div>
+} @else {
+  @for (tour of vm.toursWithStats(); track tour.id) {
+    <tour-card
+      [tour]="tour"
+      (edit)="editTour.emit($event)"
+      (delete)="handleDelete($event)"
+    ></tour-card>
+  }
 }

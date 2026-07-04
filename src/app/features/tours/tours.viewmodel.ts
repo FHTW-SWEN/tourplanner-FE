@@ -5,17 +5,69 @@ import { TourApiService } from '../../core/services/tour-api.service';
 @Injectable({ providedIn: 'root' })
 export class ToursViewModel {
   private api = inject(TourApiService);
+  private searchDebounceId: ReturnType<typeof setTimeout> | null = null;
+  private tourRequestId = 0;
 
   tours = signal<Tour[]>([]);
   tourLogs = signal<TourLog[]>([]);
   photos = signal<TourPhoto[]>([]);
   photoUploadError = signal<string | null>(null);
   selectedTourId = signal<string | null>(null);
+  tourSearchQuery = signal('');
+  tourListLoading = signal(false);
 
   //  Tours 
 
   loadTours(): void {
-    this.api.getTours().subscribe(tours => this.tours.set(tours));
+    const requestId = ++this.tourRequestId;
+    this.tourListLoading.set(true);
+
+    this.api.getTours().subscribe({
+      next: tours => {
+        if (requestId !== this.tourRequestId) return;
+        this.tours.set(tours);
+        this.ensureSelectedTourIsVisible();
+      },
+      error: () => {
+        if (requestId !== this.tourRequestId) return;
+        this.tours.set([]);
+        this.tourListLoading.set(false);
+      },
+      complete: () => {
+        if (requestId === this.tourRequestId) this.tourListLoading.set(false);
+      },
+    });
+  }
+
+  setTourSearchQuery(query: string): void {
+    this.tourSearchQuery.set(query);
+
+    if (this.searchDebounceId) {
+      clearTimeout(this.searchDebounceId);
+    }
+
+    this.searchDebounceId = setTimeout(() => this.searchTours(query), 300);
+  }
+
+  private searchTours(query: string): void {
+    const requestId = ++this.tourRequestId;
+    this.tourListLoading.set(true);
+
+    this.api.searchTours(query).subscribe({
+      next: tours => {
+        if (requestId !== this.tourRequestId) return;
+        this.tours.set(tours);
+        this.ensureSelectedTourIsVisible();
+      },
+      error: () => {
+        if (requestId !== this.tourRequestId) return;
+        this.tours.set([]);
+        this.tourListLoading.set(false);
+      },
+      complete: () => {
+        if (requestId === this.tourRequestId) this.tourListLoading.set(false);
+      },
+    });
   }
 
   addTour(tour: Tour): void {
@@ -87,10 +139,10 @@ export class ToursViewModel {
     const logs = this.tourLogs();
     return this.tours().map(tour => {
       const tourLogs = logs.filter(l => l.tourId === tour.id);
-      const popularity = tourLogs.length;
+      const popularity = tourLogs.length || tour.popularity;
 
       if (tourLogs.length === 0) {
-        return { ...tour, popularity, childFriendliness: undefined };
+        return { ...tour, popularity, childFriendliness: tour.childFriendliness };
       }
 
       const avgDifficulty = tourLogs.reduce((s, l) => s + l.difficulty, 0) / tourLogs.length;
@@ -123,5 +175,13 @@ export class ToursViewModel {
     return this.photos().filter(p => p.tourId === id);
   });
 
+  private ensureSelectedTourIsVisible(): void {
+    const selectedId = this.selectedTourId();
+    if (selectedId && !this.tours().some(tour => tour.id === selectedId)) {
+      this.selectedTourId.set(null);
+      this.tourLogs.set([]);
+      this.photos.set([]);
+    }
+  }
   
 }

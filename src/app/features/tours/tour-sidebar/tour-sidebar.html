@@ -1,4 +1,14 @@
 <aside class="flex h-full min-h-0 w-full flex-col border-r border-secondary-light p-4">
+  <label for="tour-search" class="mb-2 text-sm font-medium text-gray-600">Search tours</label>
+  <input
+    id="tour-search"
+    type="search"
+    class="mb-3 w-full rounded border border-secondary-light px-3 py-2 text-sm outline-none transition focus:border-[#1e3a5f] focus:ring-2 focus:ring-[#1e3a5f]/15"
+    placeholder="Name, route, log, rating..."
+    [value]="vm.tourSearchQuery()"
+    (input)="onSearchInput($event)"
+  />
+
   <div class="min-h-0 flex-1 overflow-y-auto pr-1">
     <tour-list (editTour)="openEditTourModal($event)"></tour-list>
   </div>

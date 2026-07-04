@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { ImportResult, Tour, TourDataExport, TourLog, TourPhoto } from '../models/index';
 import { environment } from '../../../environments/environment';
@@ -12,6 +12,11 @@ export class TourApiService {
   // Tours
   getTours(): Observable<Tour[]> {
     return this.http.get<Tour[]>(`${this.base}/tours`);
+  }
+
+  searchTours(query: string): Observable<Tour[]> {
+    const params = new HttpParams().set('q', query);
+    return this.http.get<Tour[]>(`${this.base}/tours/search`, { params });
   }
 
   createTour(tour: Tour): Observable<Tour> {
