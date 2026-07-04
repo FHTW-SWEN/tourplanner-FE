@@ -3,11 +3,12 @@ import { transportLabel } from '../../../core/constants/tour-transport';
 import { ToursViewModel } from '../tours.viewmodel';
 import { MapComponent } from '../map/map.component';
 import { TourLogList } from '../tour-log-list/tour-log-list';
+import { TourPhotoGallery } from '../tour-photo-gallery/tour-photo-gallery';
 
 @Component({
   selector: 'app-tour-detail',
   standalone: true,
-  imports: [MapComponent, TourLogList],
+  imports: [MapComponent, TourLogList, TourPhotoGallery],
   host: { class: 'min-h-0 flex-1' },
   templateUrl: "./tour-detail.html",
 })

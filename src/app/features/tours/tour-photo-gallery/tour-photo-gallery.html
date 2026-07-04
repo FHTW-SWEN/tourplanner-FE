@@ -1,0 +1,52 @@
+<div class="flex flex-col gap-2">
+  <div class="flex items-center justify-between">
+    <h3 class="text-base font-semibold text-secondary">Fotos</h3>
+    <label class="cursor-pointer rounded bg-[#1e3a5f] px-3 py-1 text-xs font-medium text-white hover:bg-[#16304f]">
+      + Foto hinzufügen
+      <input type="file" accept="image/*" class="hidden" (change)="onFileSelected($event)" />
+    </label>
+  </div>
+
+  @if (vm.photoUploadError()) {
+    <p class="text-xs text-red-500">{{ vm.photoUploadError() }}</p>
+  }
+
+  @if (vm.photosForSelectedTour().length === 0) {
+    <p class="text-sm text-gray-400">Noch keine Fotos. Lade das erste hoch!</p>
+  } @else {
+    <div class="grid grid-cols-3 gap-2 sm:grid-cols-4">
+      @for (photo of vm.photosForSelectedTour(); track photo.id) {
+        <div
+          class="group relative aspect-square cursor-pointer overflow-hidden rounded bg-secondary-light"
+          (click)="openLightbox(photo)"
+        >
+          <img
+            [src]="photo.dataUrl"
+            [alt]="photo.caption || photo.fileName"
+            class="h-full w-full object-cover transition group-hover:scale-105"
+          />
+          <button
+            type="button"
+            class="absolute right-1 top-1 hidden h-6 w-6 items-center justify-center rounded-full bg-black/60 text-xs text-white group-hover:flex"
+            (click)="handleDelete(photo.id, $event)"
+          >
+            ✕
+          </button>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+@if (lightboxPhoto) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4" (click)="closeLightbox()">
+    <img
+      [src]="lightboxPhoto.dataUrl"
+      [alt]="lightboxPhoto.caption || lightboxPhoto.fileName"
+      class="max-h-[90vh] max-w-[90vw] rounded object-contain"
+    />
+    @if (lightboxPhoto.caption) {
+      <p class="absolute bottom-6 text-sm text-white">{{ lightboxPhoto.caption }}</p>
+    }
+  </div>
+}

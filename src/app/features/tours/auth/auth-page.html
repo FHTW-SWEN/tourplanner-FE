@@ -34,6 +34,23 @@
         }
       </div>
 
+      @if (!isLoginMode) {
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700">Email</label>
+          <input
+            id="email"
+            formControlName="email"
+            type="email"
+            placeholder="Enter email"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            [class.border-red-400]="emailControl.invalid && emailControl.touched"
+          />
+          @if (emailControl.invalid && emailControl.touched) {
+            <p class="mt-1 text-xs text-red-500">Please enter a valid email address.</p>
+          }
+        </div>
+      }
+
       <div>
         <label class="mb-1 block text-sm font-medium text-gray-700">Password</label>
         <input
@@ -48,6 +65,25 @@
           <p class="mt-1 text-xs text-red-500">Password must be at least 6 characters.</p>
         }
       </div>
+
+      @if (!isLoginMode) {
+        <div>
+          <label class="mb-1 block text-sm font-medium text-gray-700">Confirm Password</label>
+          <input
+            id="confirmPassword"
+            formControlName="confirmPassword"
+            type="password"
+            placeholder="Re-enter password"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-primary focus:outline-none"
+            [class.border-red-400]="(confirmPasswordControl.invalid && confirmPasswordControl.touched) || passwordMismatch"
+          />
+          @if (confirmPasswordControl.invalid && confirmPasswordControl.touched) {
+            <p class="mt-1 text-xs text-red-500">Please confirm your password.</p>
+          } @else if (passwordMismatch) {
+            <p class="mt-1 text-xs text-red-500">Passwords do not match.</p>
+          }
+        </div>
+      }
 
       <button
         type="submit"

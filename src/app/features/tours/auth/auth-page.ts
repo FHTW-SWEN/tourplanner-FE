@@ -1,8 +1,16 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, ReactiveFormsModule, ValidationErrors, ValidatorFn, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
+
+function passwordsMatchValidator(): ValidatorFn {
+  return (group: AbstractControl): ValidationErrors | null => {
+    const password = group.get('password')?.value;
+    const confirmPassword = group.get('confirmPassword')?.value;
+    return password === confirmPassword ? null : { passwordMismatch: true };
+  };
+}
 
 @Component({
   selector: 'app-auth-page',
@@ -19,16 +27,45 @@ export class AuthPage {
   errorMessage = '';
   successMessage = '';
 
-  form = this.fb.nonNullable.group({
-    username: ['', [Validators.required, Validators.minLength(3)]],
-    password: ['', [Validators.required, Validators.minLength(6)]],
-  });
+  form = this.fb.nonNullable.group(
+    {
+      username: ['', [Validators.required, Validators.minLength(3)]],
+      email: [''],
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      confirmPassword: [''],
+    },
+    { validators: [] as ValidatorFn[] }
+  );
+
+  constructor() {
+    this.applyModeValidators();
+  }
+
+  private applyModeValidators(): void {
+    const emailControl = this.form.controls.email;
+    const confirmPasswordControl = this.form.controls.confirmPassword;
+
+    if (this.isLoginMode) {
+      emailControl.clearValidators();
+      confirmPasswordControl.clearValidators();
+      this.form.setValidators([]);
+    } else {
+      emailControl.setValidators([Validators.required, Validators.email]);
+      confirmPasswordControl.setValidators([Validators.required]);
+      this.form.setValidators([passwordsMatchValidator()]);
+    }
+
+    emailControl.updateValueAndValidity();
+    confirmPasswordControl.updateValueAndValidity();
+    this.form.updateValueAndValidity();
+  }
 
   toggleMode(): void {
     this.isLoginMode = !this.isLoginMode;
     this.errorMessage = '';
     this.successMessage = '';
     this.form.reset();
+    this.applyModeValidators();
   }
 
   submit(): void {
@@ -37,7 +74,7 @@ export class AuthPage {
       return;
     }
 
-    const { username, password } = this.form.getRawValue();
+    const { username, email, password, confirmPassword } = this.form.getRawValue();
     this.errorMessage = '';
     this.successMessage = '';
 
@@ -47,11 +84,12 @@ export class AuthPage {
         error: () => this.errorMessage = 'Invalid username or password.',
       });
     } else {
-      this.authService.register({ username, password }).subscribe({
+      this.authService.register({ username, email, password, confirmPassword }).subscribe({
         next: () => {
           this.successMessage = 'Registration successful! Please log in.';
           this.isLoginMode = true;
           this.form.reset();
+          this.applyModeValidators();
         },
         error: (err) => {
           this.errorMessage = err?.error?.message ?? 'Registration failed.';
@@ -61,5 +99,10 @@ export class AuthPage {
   }
 
   get usernameControl() { return this.form.controls.username; }
+  get emailControl() { return this.form.controls.email; }
   get passwordControl() { return this.form.controls.password; }
+  get confirmPasswordControl() { return this.form.controls.confirmPassword; }
+  get passwordMismatch(): boolean {
+    return this.form.hasError('passwordMismatch') && this.confirmPasswordControl.touched;
+  }
 }
