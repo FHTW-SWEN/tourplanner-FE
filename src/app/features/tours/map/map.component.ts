@@ -83,7 +83,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       try {
         coords = JSON.parse(routeCoordinatesJson) as [number, number][];
       } catch {
-        console.error('Ungültiges routeCoordinates Format:', routeCoordinatesJson);
+        console.error('Invalid routeCoordinates format:', routeCoordinatesJson);
         return;
       }
 
@@ -92,7 +92,7 @@ export class MapComponent implements AfterViewInit, OnDestroy {
       const first = coords[0];
       const last = coords[coords.length - 1];
       this.mapFacade.addMarker(first[0], first[1], `Start: ${fromLabel}`);
-      this.mapFacade.addMarker(last[0], last[1], `Ziel: ${toLabel}`);
+      this.mapFacade.addMarker(last[0], last[1], `Destination: ${toLabel}`);
 
       this.mapFacade.drawRoute(coords);
 

@@ -69,7 +69,7 @@ export class ToursViewModel {
     this.photoUploadError.set(null);
     this.api.uploadPhoto(tourId, file, caption).subscribe({
       next: created => this.photos.update(ps => [created, ...ps]),
-      error: err => this.photoUploadError.set(err?.error?.message ?? 'Upload fehlgeschlagen.'),
+      error: err => this.photoUploadError.set(err?.error?.message ?? 'Upload failed.'),
     });
   }
 
