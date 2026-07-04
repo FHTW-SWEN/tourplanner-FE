@@ -20,12 +20,12 @@ export class TourPhotoGallery {
     if (!file) return;
 
     if (file.size > 8 * 1024 * 1024) {
-      alert('Datei ist zu groß (max. 8 MB).');
+      alert('File is too large (max. 8 MB).');
       input.value = '';
       return;
     }
 
-    const caption = window.prompt('Bildunterschrift (optional):') ?? '';
+    const caption = window.prompt('Caption (optional):') ?? '';
     this.vm.uploadPhoto(file, caption.trim() || undefined);
     input.value = '';
   }
@@ -41,7 +41,7 @@ export class TourPhotoGallery {
   handleDelete(photoId: string | undefined, event: Event): void {
     event.stopPropagation();
     if (!photoId) return;
-    if (confirm('Foto wirklich löschen?')) {
+    if (confirm('Are you sure you want to delete this photo?')) {
       this.vm.deletePhoto(photoId);
     }
   }
