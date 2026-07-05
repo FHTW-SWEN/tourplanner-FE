@@ -4,6 +4,6 @@ export interface TourPhoto {
   fileName: string;
   caption?: string;
   uploadedAt?: string;
-  /** Data-URL (data:image/...;base64,...) — direkt in <img src> nutzbar. */
+  /** Data-URL (data:image/...;base64,...) — can be used directly <img src> . */
   dataUrl: string;
 }
