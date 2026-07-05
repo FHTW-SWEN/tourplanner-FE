@@ -14,8 +14,6 @@ export interface Tour {
    * Kommt vom Backend (ORS Directions API), wird von Leaflet gerendert.
    */
   routeCoordinates?: string;
-  /** Pfad/URL zum Tour-Bild auf dem Server-Filesystem. */
-  imageUrl?: string;
   /** Computed: abgeleitet aus der Anzahl der Tour-Logs. */
   popularity?: number;
   /** Computed: abgeleitet aus Schwierigkeit, Zeit und Distanz der Logs. */

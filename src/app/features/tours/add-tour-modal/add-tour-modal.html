@@ -62,19 +62,6 @@
           </select>
         </div>
 
-        <div class="mb-3">
-          <label class="block text-sm font-medium text-slate-700">Tour Image</label>
-          <input
-            type="file"
-            accept="image/*"
-            class="mt-1 w-full text-sm text-slate-600"
-            (change)="onImageSelected($event)"
-          />
-          @if (form.imageUrl) {
-            <img [src]="form.imageUrl" alt="Tour preview" class="mt-2 h-24 w-full rounded object-cover" />
-          }
-        </div>
-
         <div class="mb-4 rounded border border-blue-200 bg-blue-50 px-3 py-2 text-sm text-blue-800">
           Distance and estimated time are not calculated yet (demo data or 0 for new tours). OpenRouteService can be added later.
         </div>

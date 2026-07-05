@@ -10,7 +10,6 @@ export interface TourPayload {
   from: string;
   to: string;
   transport: string;
-  imageUrl?: string;
 }
 
 @Component({
@@ -38,7 +37,6 @@ export class AddTourModal implements OnChanges {
         from: this.editTour.from,
         to: this.editTour.to,
         transport: this.editTour.transportType,
-        imageUrl: this.editTour.imageUrl ?? '',
       };
     } else {
       this.form = this.emptyForm();
@@ -46,14 +44,7 @@ export class AddTourModal implements OnChanges {
   }
 
   private emptyForm(): TourPayload {
-    return { name: '', description: '', from: '', to: '', transport: 'walk', imageUrl: '' };
-  }
-
-  onImageSelected(event: Event): void {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (file) {
-      this.form.imageUrl = URL.createObjectURL(file);
-    }
+    return { name: '', description: '', from: '', to: '', transport: 'walk' };
   }
 
   closeModal(): void {

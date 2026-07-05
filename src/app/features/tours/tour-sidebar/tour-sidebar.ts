@@ -97,8 +97,6 @@ export class TourSidebar {
   }
 
   handleSaveTour(payload: TourPayload): void {
-    const imageUrl = payload.imageUrl?.trim() || undefined;
-
     if (this.editingTour) {
       this.vm.updateTour({
         ...this.editingTour,
@@ -107,7 +105,6 @@ export class TourSidebar {
         from: payload.from,
         to: payload.to,
         transportType: payload.transport,
-        imageUrl,
       });
     } else {
       this.vm.addTour({
@@ -118,7 +115,6 @@ export class TourSidebar {
         transportType: payload.transport,
         distance: 0,
         estimatedTime: 0,
-        ...(imageUrl ? { imageUrl } : {}),
       });
     }
 
