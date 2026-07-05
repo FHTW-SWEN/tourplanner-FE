@@ -139,7 +139,7 @@ export class ToursViewModel {
     const logs = this.tourLogs();
     return this.tours().map(tour => {
       const tourLogs = logs.filter(l => l.tourId === tour.id);
-      const popularity = tourLogs.length || tour.popularity;
+      const popularity = tourLogs.length || (tour.popularity ?? 0);
 
       if (tourLogs.length === 0) {
         return { ...tour, popularity, childFriendliness: tour.childFriendliness };
