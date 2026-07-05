@@ -11,7 +11,6 @@ export interface ExportedTour {
   distance?: number;
   estimatedTime?: number;
   routeCoordinates?: string;
-  imageUrl?: string;
   logs: ExportedTourLog[];
 }
 
